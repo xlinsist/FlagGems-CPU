@@ -96,6 +96,15 @@ class LibTuner(triton.runtime.Autotuner):
             # In Triton v2.2 and v2.3, enable_persistent is stored in config cache
             # but not defined as initialization parameter
             numargs.pop("enable_persistent", None)
+
+            # Filter out invalid parameters in kwargs and numargs to solve the problem 
+            # of inconsistent parameter lists when migrating FlagGems to CPU.
+            # TODO: Find the root cause of the inconsistent parameter lists.
+            valid_params = inspect.signature(triton.Config.__init__).parameters
+            valid_keys = set(valid_params.keys()) - {"self"}
+            kwargs = {k: v for k, v in kwargs.items() if k in valid_keys}
+            numargs = {k: v for k, v in numargs.items() if k in valid_keys}
+
             config = triton.Config(kwargs, **numargs)
             self.cache[tuple(key)] = config
 
