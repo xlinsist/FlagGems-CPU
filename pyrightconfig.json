@@ -1,0 +1,5 @@
+{
+  "reportUnreachable": false,
+  "typeCheckingMode": "standard",
+  "reportIncompatibleMethodOverride": false
+}

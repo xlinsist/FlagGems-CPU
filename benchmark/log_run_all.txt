@@ -1,0 +1,54 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.16, pytest-8.3.5, pluggy-1.5.0
+rootdir: /home/cyanic/repos/FlagGems-CPU
+configfile: pytest.ini
+collected 2 items
+
+test_blas_perf.py Triton autotuning for function addmm_kernel finished after 0.93s; best config selected: BLOCK_SIZE_M: 4, BLOCK_SIZE_N: 16, BLOCK_SIZE_K: 4, num_warps: 4, num_ctas: 1, num_stages: 2, num_threads: 0, maxnreg: None;
+Triton autotuning for function addmm_kernel finished after 0.73s; best config selected: BLOCK_SIZE_M: 16, BLOCK_SIZE_N: 64, BLOCK_SIZE_K: 4, num_warps: 4, num_ctas: 1, num_stages: 2, num_threads: 0, maxnreg: None;
+Triton autotuning for function addmm_kernel finished after 1.08s; best config selected: BLOCK_SIZE_M: 128, BLOCK_SIZE_N: 128, BLOCK_SIZE_K: 8, num_warps: 4, num_ctas: 1, num_stages: 2, num_threads: 0, maxnreg: None;
+Triton autotuning for function addmm_kernel finished after 3.33s; best config selected: BLOCK_SIZE_M: 128, BLOCK_SIZE_N: 128, BLOCK_SIZE_K: 8, num_warps: 4, num_ctas: 1, num_stages: 2, num_threads: 0, maxnreg: None;
+
+Operator: addmm  Performance Test (dtype=torch.float32, mode=cpu,level=core)
+Status       Torch Latency (ms)    Gems Latency (ms)         Gems Speedup               TFLOPS          Size Detail
+--------------------------------------------------------------------------------------------------------------------
+SUCCESS               0.006831            0.030255               0.226               0.017          [torch.Size([64, 64]), torch.Size([64, 64]), torch.Size([64, 64])]
+SUCCESS               0.104811            0.259023               0.405               0.130          [torch.Size([256, 256]), torch.Size([256, 256]), torch.Size([256, 256])]
+SUCCESS               0.006874            0.035660               0.193               0.015          [torch.Size([64, 64]), torch.Size([64, 64]), torch.Size([64, 64])]
+SUCCESS               5.186765           12.756722               0.407               0.168          [torch.Size([1024, 1024]), torch.Size([1024, 1024]), torch.Size([1024, 1024])]
+SUCCESS              37.366836           83.170357               0.449               0.207          [torch.Size([2048, 2048]), torch.Size([2048, 2048]), torch.Size([2048, 2048])]
+
+.Triton autotuning for function mm_kernel finished after 5.84s; best config selected: BLOCK_M: 16, BLOCK_N: 32, BLOCK_K: 4, SPLIT_K: 1, num_warps: 4, num_ctas: 1, num_stages: 3, num_threads: 0, maxnreg: None;
+Triton autotuning for function mm_kernel finished after 5.87s; best config selected: BLOCK_M: 32, BLOCK_N: 64, BLOCK_K: 4, SPLIT_K: 1, num_warps: 4, num_ctas: 1, num_stages: 3, num_threads: 0, maxnreg: None;
+Triton autotuning for function mm_kernel finished after 8.34s; best config selected: BLOCK_M: 32, BLOCK_N: 128, BLOCK_K: 4, SPLIT_K: 1, num_warps: 4, num_ctas: 1, num_stages: 3, num_threads: 0, maxnreg: None;
+Triton autotuning for function mm_kernel finished after 22.32s; best config selected: BLOCK_M: 128, BLOCK_N: 128, BLOCK_K: 4, SPLIT_K: 1, num_warps: 4, num_ctas: 1, num_stages: 3, num_threads: 0, maxnreg: None;
+
+Operator: mm  Performance Test (dtype=torch.float32, mode=cpu,level=core)
+Status       Torch Latency (ms)    Gems Latency (ms)         Gems Speedup               TFLOPS          Size Detail
+--------------------------------------------------------------------------------------------------------------------
+SUCCESS               0.003810            0.025332               0.150               0.021          [torch.Size([64, 64]), torch.Size([64, 64])]
+SUCCESS               0.094857            0.169930               0.558               0.197          [torch.Size([256, 256]), torch.Size([256, 256])]
+SUCCESS               0.004323            0.025442               0.170               0.021          [torch.Size([64, 64]), torch.Size([64, 64])]
+SUCCESS               5.040543            9.719436               0.519               0.221          [torch.Size([1024, 1024]), torch.Size([1024, 1024])]
+SUCCESS              38.458352           80.546601               0.477               0.213          [torch.Size([2048, 2048]), torch.Size([2048, 2048])]
+
+.
+
+=============================== warnings summary ===============================
+benchmark/test_blas_perf.py::test_blas_benchmark[addmm-addmm-addmm_input_fn]
+  /home/cyanic/miniconda3/envs/FlagGems/lib/python3.10/site-packages/torch/library.py:365: UserWarning: Warning only once for all operators,  other operators may also be overridden.
+    Overriding a previously registered kernel for the same operator and the same dispatch key
+    operator: aten::add.Tensor(Tensor self, Tensor other, *, Scalar alpha=1) -> Tensor
+      registered at /pytorch/build/aten/src/ATen/RegisterSchema.cpp:6
+    dispatch key: CPU
+    previous kernel: registered at /pytorch/aten/src/ATen/LegacyBatchingRegistrations.cpp:1079
+         new kernel: registered at /dev/null:370 (Triggered internally at /pytorch/aten/src/ATen/core/dispatch/OperatorEntry.cpp:154.)
+    self.m.impl(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=================== 2 passed, 1 warning in 82.99s (0:01:22) ====================
+
+real	1m24.510s
+user	11m58.838s
+sys	0m24.239s
+---------------------------------------------

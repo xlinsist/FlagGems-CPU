@@ -1,0 +1,3 @@
+op_name                        float32_speedup      comp_fp32_speedup   all_tests_passed    
+mm                             0.370520             0.908666            yes                 
+
