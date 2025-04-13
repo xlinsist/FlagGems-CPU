@@ -11,6 +11,7 @@ import triton
 import yaml
 
 import flag_gems
+flag_gems.device = "cpu"
 
 from .attri_util import (
     BOOL_DTYPES,
