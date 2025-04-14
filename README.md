@@ -42,9 +42,56 @@ print()
 print(C2)
 ```
 
-2. Benchmark operator performance. Take mm and layer_norm for example:
+2. Benchmark single operator performance. Take `mm` and `layer_norm` for example:
 ```shell
 cd benchmark
 time pytest test_blas_perf.py -s --mode cpu --record log --level core --dtypes float32 --warmup 25 --iter 100 -m mm
 time pytest test_norm_perf.py -s --mode cpu --record log --level core --dtypes float32 --warmup 25 --iter 100 -m layer_norm
+```
+
+3. Benchmark all ops performance. You can modify `run_all_perf_tests.sh` to test the ops you want.
+```shell
+cd benchmark
+bash run_all_perf_tests.sh # It will generate `result_test_all.log`
+python summary_for_plot.py result_test_all.log
+```
+It will generate `result_test_summary.log` with contents like this:
+```
+op_name                        float32_speedup      all_tests_passed    
+addmm                          1.215471             yes                 
+batch_norm                     1.020813             yes                 
+bmm                            1.186168             yes                 
+group_norm                     1.048566             yes                 
+instance_norm                  1.013160             yes                 
+layer_norm                     0.994558             yes                 
+mm                             1.218488             yes                 
+mv                             1.028544             yes                 
+outer                          0.982253             yes                 
+vdot                           1.020879             yes                 
+vector_norm                    1.094137             yes                 
+weight_norm                    0.981210             yes                 
+weight_norm_interface          0.967518             yes                 
+```
+
+4. Compare all ops performance.
+```shell
+cd benchmark
+python summary_for_plot.py result_test_all_your_methmod.log -c result_test_all_baseline_methmod.log
+```
+It will generate `result_test_compare.log` with contents like this:
+```
+op_name                        float32_speedup      comp_fp32_speedup   all_tests_passed    
+addmm                          1.215471             0.929496            yes                 
+batch_norm                     1.020813             0.983629            yes                 
+bmm                            1.186168             1.014502            yes                 
+group_norm                     1.048566             0.895594            yes                 
+instance_norm                  1.013160             0.962255            yes                 
+layer_norm                     0.994558             1.028554            yes                 
+mm                             1.218488             1.035678            yes                 
+mv                             1.028544             0.924285            yes                 
+outer                          0.982253             0.894619            yes                 
+vdot                           1.020879             0.940504            yes                 
+vector_norm                    1.094137             1.062247            yes                 
+weight_norm                    0.981210             0.967043            yes                 
+weight_norm_interface          0.967518             0.920457            yes                 
 ```

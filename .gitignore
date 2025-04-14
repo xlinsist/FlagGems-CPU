@@ -11,6 +11,7 @@ __pycache__/
 
 # Distribution files
 build*/
+*backup*/
 *.egg-info/
 
 # Executables
@@ -20,6 +21,7 @@ build*/
 *.apk
 
 *.log
+*.txt
 *.json
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
