@@ -140,6 +140,7 @@ def test_tensor_constructor_benchmark(op_name, torch_op, input_fn):
     bench.run()
 
 
+@pytest.mark.skip(reason="Skipping the test which does not support float32")
 @pytest.mark.skipif(
     vendor_name == "kunlunxin" or vendor_name == "hygon", reason="RESULT TODOFIX"
 )

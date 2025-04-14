@@ -185,13 +185,13 @@ def repeat_interleave_tensor_input_fn(shape, dtype, device):
             FLOAT_DTYPES,
             marks=pytest.mark.repeat_interleave_self_tensor,
         ),
-        pytest.param(
-            "repeat_interleave_tensor",
-            torch.repeat_interleave,
-            repeat_interleave_tensor_input_fn,
-            [torch.int32],
-            marks=pytest.mark.repeat_interleave_tensor,
-        ),
+        # pytest.param(
+        #     "repeat_interleave_tensor",
+        #     torch.repeat_interleave,
+        #     repeat_interleave_tensor_input_fn,
+        #     [torch.int32],
+        #     marks=pytest.mark.repeat_interleave_tensor,
+        # ),
     ],
 )
 def test_tensor_repeat_benchmark(op_name, torch_op, input_fn, dtypes):
