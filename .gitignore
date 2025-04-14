@@ -14,6 +14,7 @@ __pycache__/
 
 # Distribution files
 build*/
+*backup*/
 *.egg-info/
 .eggs/
 dist/
@@ -33,6 +34,7 @@ tests/*.json
 *.apk
 
 *.log
+*.txt
 *.json
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`

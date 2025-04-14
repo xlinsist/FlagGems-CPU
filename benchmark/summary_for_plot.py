@@ -35,6 +35,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from attri_util import BenchmarkMetrics, BenchmarkResult
+import os
 
 # to enable log files crossing speedup calculation
 ENABLE_COMPARE = False
@@ -66,32 +67,32 @@ class SummaryResultOverDtype:
         return (
             (
                 f"{self.op_name:<30} "
-                f"{self.float16_speedup:<20.6f} "
+                # f"{self.float16_speedup:<20.6f} "
                 f"{self.float32_speedup:<20.6f} "
-                f"{self.bfloat16_speedup:<20.6f} "
-                f"{self.int16_speedup:<20.6f} "
-                f"{self.int32_speedup:<20.6f} "
-                f"{self.bool_speedup:<20.6f} "
-                f"{self.cfloat_speedup:<20.6f}"
-                f"{self.compared_float16_speedup:<20.6f}"
+                # f"{self.bfloat16_speedup:<20.6f} "
+                # f"{self.int16_speedup:<20.6f} "
+                # f"{self.int32_speedup:<20.6f} "
+                # f"{self.bool_speedup:<20.6f} "
+                # f"{self.cfloat_speedup:<20.6f}"
+                # f"{self.compared_float16_speedup:<20.6f}"
                 f"{self.compared_float32_speedup:<20.6f}"
-                f"{self.compared_bfloat16_speedup:<20.6f}"
-                f"{self.compared_int16_speedup:<20.6f}"
-                f"{self.compared_int32_speedup:<20.6f}"
-                f"{self.compared_bool_speedup:<20.6f}"
-                f"{self.compared_cfloat_speedup:<20.6f}"
+                # f"{self.compared_bfloat16_speedup:<20.6f}"
+                # f"{self.compared_int16_speedup:<20.6f}"
+                # f"{self.compared_int32_speedup:<20.6f}"
+                # f"{self.compared_bool_speedup:<20.6f}"
+                # f"{self.compared_cfloat_speedup:<20.6f}"
                 f"{all_shapes_status:<20}"
             )
             if ENABLE_COMPARE
             else (
                 f"{self.op_name:<30} "
-                f"{self.float16_speedup:<20.6f} "
+                # f"{self.float16_speedup:<20.6f} "
                 f"{self.float32_speedup:<20.6f} "
-                f"{self.bfloat16_speedup:<20.6f} "
-                f"{self.int16_speedup:<20.6f} "
-                f"{self.int32_speedup:<20.6f} "
-                f"{self.bool_speedup:<20.6f} "
-                f"{self.cfloat_speedup:<20.6f}"
+                # f"{self.bfloat16_speedup:<20.6f} "
+                # f"{self.int16_speedup:<20.6f} "
+                # f"{self.int32_speedup:<20.6f} "
+                # f"{self.bool_speedup:<20.6f} "
+                # f"{self.cfloat_speedup:<20.6f}"
                 f"{all_shapes_status:<20}"
             )
         )
@@ -212,13 +213,13 @@ def summary_for_plot(benchmark_results):
     summary = defaultdict(SummaryResultOverDtype)
 
     dtype_mapping = {
-        "torch.float16": "float16_speedup",
+        # "torch.float16": "float16_speedup",
         "torch.float32": "float32_speedup",
-        "torch.bfloat16": "bfloat16_speedup",
-        "torch.int16": "int16_speedup",
-        "torch.int32": "int32_speedup",
-        "torch.bool": "bool_speedup",
-        "torch.complex64": "cfloat_speedup",
+        # "torch.bfloat16": "bfloat16_speedup",
+        # "torch.int16": "int16_speedup",
+        # "torch.int32": "int32_speedup",
+        # "torch.bool": "bool_speedup",
+        # "torch.complex64": "cfloat_speedup",
     }
 
     for item in benchmark_results:
@@ -242,48 +243,18 @@ def summary_for_plot(benchmark_results):
 
     # sort the keys based on `op_name`
     sorted_summary = sorted(summary.values(), key=lambda x: x.op_name)
-
-    header = (
-        (
-            f"{'op_name':<30} "
-            f"{'float16_speedup':<20} "
-            f"{'float32_speedup':<20} "
-            f"{'bfloat16_speedup':<20} "
-            f"{'int16_speedup':<20} "
-            f"{'int32_speedup':<20} "
-            f"{'bool_speedup':<20} "
-            f"{'cfloat_speedup':<20}"
-            f"{'comp_fp16_speedup':<20}"
-            f"{'comp_fp32_speedup':<20}"
-            f"{'comp_bf16_speedup':<20}"
-            f"{'comp_int16_speedup':<20}"
-            f"{'comp_int32_speedup':<20}"
-            f"{'comp_bool_speedup':<20}"
-            f"{'comp_cfloat_speedup':<20}"
-            f"{'all_tests_passed':<20}"
-        )
-        if ENABLE_COMPARE
-        else (
-            f"{'op_name':<30} "
-            f"{'float16_speedup':<20} "
-            f"{'float32_speedup':<20} "
-            f"{'bfloat16_speedup':<20} "
-            f"{'int16_speedup':<20} "
-            f"{'int32_speedup':<20} "
-            f"{'bool_speedup':<20} "
-            f"{'cfloat_speedup':<20}"
-            f"{'all_tests_passed':<20}"
-        )
-    )
-
-    print(header)
-    for result in sorted_summary:
-        print(result)
-
-    return summary
+    return sorted_summary
 
 
 def compare_main(log_file_a, log_file_b):
+    header = (
+        (
+            f"{'op_name':<30} "
+            f"{'float32_speedup':<20} "
+            f"{'comp_fp32_speedup':<20}"
+            f"{'all_tests_passed':<20}"
+        )
+    )
     result_a = parse_log(log_file_a)
     result_b = parse_log_to_dict(log_file_b)
     for result in result_a:
@@ -292,16 +263,33 @@ def compare_main(log_file_a, log_file_b):
                 result.op_name, result.dtype, str(sub_result.shape_detail)
             )
             sub_result.compared_speedup = result_b.get(key, 0) / sub_result.latency
-
-    summary_for_plot(result_a)
+    with open("result_test_compare.log", "w") as summary_file:
+        summary_file.write(header + "\n")
+        sorted_summary = summary_for_plot(result_a)
+        for result in sorted_summary:
+            summary_file.write(str(result) + "\n")
+        summary_file.write("\n")
 
 
 def main(log_file_path):
-    result = parse_log(log_file_path)
-    summary_for_plot(result)
+    header = (
+        (
+            f"{'op_name':<30} "
+            f"{'float32_speedup':<20} "
+            f"{'all_tests_passed':<20}"
+        )
+    )
+    with open("result_test_summary.log", "w") as summary_file:
+        summary_file.write(header + "\n")
+        result = parse_log(log_file_path)
+        sorted_summary = summary_for_plot(result)
+        for result in sorted_summary:
+            summary_file.write(str(result) + "\n")
+        summary_file.write("\n")
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser(description="Parse benchmark log file.")
     parser.add_argument("log_file_path", type=str, help="Path to the log file.")
     parser.add_argument(
