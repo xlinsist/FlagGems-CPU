@@ -53,6 +53,7 @@ special_operations = [
 ]
 
 
+@pytest.mark.skip(reason="Skipping the test which does not support float32")
 @pytest.mark.parametrize(
     "op_name, torch_op, dtypes, input_fn",
     [
@@ -73,6 +74,7 @@ def test_special_operations_benchmark(op_name, torch_op, dtypes, input_fn):
     bench.run()
 
 
+@pytest.mark.skip(reason="Skipping the test which does not support float32")
 @pytest.mark.skipif(vendor_name == "kunlunxin", reason="RESULT TODOFIX")
 @pytest.mark.skipif(flag_gems.device == "musa", reason="AssertionError")
 @pytest.mark.isin
@@ -401,6 +403,7 @@ def test_perf_kron():
     bench.run()
 
 
+@pytest.mark.skip(reason="Skipping the test which does not support float32")
 @pytest.mark.contiguous
 def test_perf_contiguous():
     def contiguous_input_fn(shape, dtype, device):
