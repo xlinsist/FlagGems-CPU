@@ -13,6 +13,7 @@ UNSUPPORT_FP64 = [
     vendors.ILUVATAR,
     vendors.KUNLUNXIN,
     vendors.MTHREADS,
+    vendors.TRITON_CPU,
 ]
 
 
@@ -79,14 +80,23 @@ class DeviceDetector(object):
 
         def runcmd(single_info):
             device_query_cmd = single_info.device_query_cmd
-            try:
+            try:    
+                if isinstance(device_query_cmd, tuple):
+                    device_query_cmd = list(device_query_cmd)
+                    # device_query_cmd = None
+                else: # isinstance(device_query_cmd, str)
+                    device_query_cmd = [device_query_cmd]
+
                 result = subprocess.run(
-                    [device_query_cmd], capture_output=True, text=True
+                    device_query_cmd, capture_output=True, text=True
                 )
                 if result.returncode == 0:
                     result_single_info.put(single_info)
+                    print(f'Run {device_query_cmd}...Success')
+                else:
+                    print(f'Run {device_query_cmd}...Fail')
             except:  # noqa: E722
-                pass
+                print(f'Run {device_query_cmd}...Exception')
 
         threads = []
         for single_info in vendor_infos:

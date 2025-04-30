@@ -125,7 +125,13 @@ def mm(a, b):
         triton.cdiv(M, META["BLOCK_M"]) * triton.cdiv(N, META["BLOCK_N"]),
         META["SPLIT_K"],
     )
-    with torch_device_fn.device(a.device):
+    # with torch_device_fn.device(a.device):
+    if device.type == 'cpu':
+        torch_ctx = torch_device_fn._device(a.device)
+    else:
+        torch_ctx = torch_device_fn.device(a.device)
+
+    with torch_ctx:
         mm_kernel[grid](
             a,
             b,
