@@ -4,7 +4,7 @@ import torch
 import triton
 
 from flag_gems.ops.randn import randn_kernel
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import pointwise_dynamic
 from flag_gems.utils.random_utils import philox_backend_seed_offset
 from flag_gems.utils.shape_utils import broadcast_shapes, volume
@@ -51,10 +51,14 @@ def normal_distribution(shape, device, *, generator=None):
     grid_fn = lambda meta: (triton.cdiv(N, meta["BLOCK"] * UNROLL),)
 
     increment = triton.cdiv(N, UNROLL)
-    philox_seed, philox_offset = philox_backend_seed_offset(
-        increment, generator=generator
-    )
-    with torch_device_fn.device(device):
+    if device.type == 'cpu':
+        # OPTIM:
+        philox_seed, philox_offset = torch.seed(), 0
+    else:
+        philox_seed, philox_offset = philox_backend_seed_offset(
+            increment, generator=generator
+        )
+    with get_torch_device_ctx(device):
         randn_kernel[grid_fn](out, N, philox_seed, philox_offset)
     return out
 

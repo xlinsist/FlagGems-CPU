@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, torch_device_fn, get_torch_device_ctx
 from flag_gems.utils.random_utils import (
     philox_backend_seed_offset,
     uint_to_uniform_float,
@@ -77,7 +77,11 @@ def randn(size, *, dtype=None, layout=None, device=None, pin_memory=None):
     # (TODO) Using Triton autotuner makes kernel parameters opaque to the caller,
     # hence we cannot obtain the per thread offset as in Pytorch.
     increment = triton.cdiv(N, UNROLL)
-    philox_seed, philox_offset = philox_backend_seed_offset(increment)
-    with torch_device_fn.device(device):
+    if device.type == 'cpu':
+        # OPTIM:
+        philox_seed, philox_offset = torch.seed(), 0
+    else:
+        philox_seed, philox_offset = philox_backend_seed_offset(increment)
+    with get_torch_device_ctx(device):
         randn_kernel[grid_fn](out, N, philox_seed, philox_offset)
     return out
