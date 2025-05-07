@@ -583,8 +583,9 @@ class LibEntry(triton.KernelInterface):
         for p in self.jit_function.params[len(args) :]:
             if p.name in kwargs:
                 val = kwargs[p.name]
-            elif p.default is inspect._empty:
-                continue
+            # TODO: What purpose these two lines for? I commented them to solve the `mismatched arguments number` error
+            # elif p.default is inspect._empty:
+            #     continue
             else:
                 val = p.default
 
