@@ -8,7 +8,7 @@ import torch
 import triton
 
 import flag_gems
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils.random_utils import set_philox_state
 
 from .accuracy_utils import gems_assert_close, init_seed, to_reference
@@ -16,6 +16,7 @@ from .conftest import TO_CPU
 
 device = flag_gems.device
 
+from .conftest import QUICK_MODE
 
 def make_input(
     batch, num_head, num_head_k, q_seq_len, kv_seq_len, head_size, dtype, device
