@@ -77,7 +77,7 @@ def trunc_divide(A, B):
         return trunc_div_func_scalar_tensor(A, B)
     else:
         # Both scalar
-        return torch.tensor(A / B)
+        return torch.tensor(A // B)
 
 
 def trunc_divide_(A, B):
