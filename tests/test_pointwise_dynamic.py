@@ -781,7 +781,7 @@ def test_dynamic_function_gsl(use_block_pointer):
 
 
 @pytest.mark.skipif(
-    get_device_properties(0).total_memory < (80 * 1024**3),
+     True if flag_gems.device == "cpu" else torch_device_fn.get_device_properties(0).total_memory < (80 * 1024**3),
     reason="This test requires a lot of memory.",
 )
 @pytest.mark.parametrize("use_block_pointer", USE_BLOCK_POINTER)

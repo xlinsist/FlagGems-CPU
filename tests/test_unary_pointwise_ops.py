@@ -656,6 +656,10 @@ def test_accuracy_erf_(shape, dtype):
 @pytest.mark.isfinite
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", ALL_FLOAT_DTYPES)
+@pytest.mark.skipif(
+    flag_gems.device == 'cpu',
+    reason="There are no `isfinite` or related functions in triton cpu end and sleef"
+)
 def test_accuracy_isfinite(shape, dtype):
     inp = torch.randn(shape, dtype=dtype, device=flag_gems.device)
     inp = torch.masked_fill(inp, inp > 1.0, float("inf"))

@@ -7,7 +7,7 @@ import triton
 from triton import language as tl
 
 import flag_gems
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, libtuner
 
 
@@ -37,7 +37,7 @@ def softmax_inner_decorator_cascade(x, dim, dtype=None):
 
     out = torch.empty_like(inp, dtype=dtype)
 
-    with torch_device_fn.device(out.device):
+    with get_torch_device_ctx(x.device):
         grid = lambda meta: (triton.cdiv(M, meta["TILE_M"]), 1, 1)
         softmax_kernel_inner[grid](
             out,
@@ -230,6 +230,10 @@ def run_two_threads():
 @pytest.mark.skipif(
     flag_gems.vendor_name == "kunlunxin",
     reason="Test Files for Operators Not Pending Testing",
+)
+@pytest.mark.skipif(
+    flag_gems.device == 'cpu',
+    reason="RuntimeError: Cannot access accelerator device when none is available.",
 )
 def test_threadsafety():
     for i in range(100):

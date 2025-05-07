@@ -690,6 +690,7 @@ def test_accuracy_floor_divide_float_(shape, dtype):
 
 @pytest.mark.skipif(flag_gems.vendor_name == "aipu", reason="TODO")
 @pytest.mark.skipif(flag_gems.device == "musa", reason="Assertion Error")
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Floating point exception")
 @pytest.mark.floor_divide
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", INT_DTYPES)
@@ -735,6 +736,7 @@ def test_accuracy_floor_divide_int(shape, dtype):
 
 
 @pytest.mark.skipif(flag_gems.device == "musa", reason="Assertion Error")
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Floating point exception")
 @pytest.mark.inplace
 @pytest.mark.floor_divide_
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
@@ -792,6 +794,7 @@ def test_accuracy_floor_divide_scalar_scalar(dtype):
 
 
 @pytest.mark.skipif(flag_gems.device == "musa", reason="Assertion Error")
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Floating point exception")
 @pytest.mark.remainder
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", INT_DTYPES)
@@ -836,6 +839,7 @@ def test_accuracy_remainder(shape, dtype):
 
 
 @pytest.mark.skipif(flag_gems.device == "musa", reason="Assertion Error")
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Floating point exception")
 @pytest.mark.inplace
 @pytest.mark.remainder_
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
@@ -1602,6 +1606,10 @@ def test_accuracy_nan_to_num(shape, dtype, nan, posinf, neginf):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(
+    flag_gems.device == 'cpu',
+    reason="There are no `isfinite` or related functions in triton cpu end and sleef"
+)
 @pytest.mark.isclose
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 # @pytest.mark.parametrize("dtype", FLOAT_DTYPES + ALL_INT_DTYPES)
