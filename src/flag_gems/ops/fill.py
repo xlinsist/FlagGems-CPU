@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import pointwise_dynamic
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def fill_tensor_func(inp, value):
 def fill_scalar(input, value):
     logger.debug("GEMS FILL (Dynamic)")
     out = torch.empty_like(input)
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         return fill_scalar_func(input, value, out0=out)
 
 
@@ -45,7 +45,6 @@ def fill_tensor(input, value):
     with torch_device_fn.device(input.device):
         return fill_tensor_func(input, value, out0=out)
 
-
 def fill_tensor_(self, value):
     if not value.is_cuda:
         return fill_scalar_(self, value.item())
@@ -54,13 +53,13 @@ def fill_tensor_(self, value):
         raise RuntimeError(
             f"fill_ only supports 0-dimension value tensor but got tensor with {value.ndim} dimensions."
         )
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         fill_tensor_func(self, value, out0=self)
     return self
 
 
 def fill_scalar_(self, value):
     logging.debug("GEMS FILL_SCALAR_")
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         fill_scalar_func(self, value, out0=self)
     return self

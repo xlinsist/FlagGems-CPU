@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, tl_extra_shim
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -209,7 +209,7 @@ def weight_norm_interface(v, g, dim=0):
         M = v.shape[0]
         N = math.prod(v.shape[1:])
         grid = lambda META: (triton.cdiv(M, META["BLOCK_ROW_SIZE"]),)
-        with torch_device_fn.device(v.device):
+        with get_torch_device_ctx(v.device):
             weight_norm_kernel_first[grid](
                 output, norm, v, g, M, N, eps=torch.finfo(torch.float32).tiny
             )
@@ -217,7 +217,7 @@ def weight_norm_interface(v, g, dim=0):
         M = math.prod(v.shape[:-1])
         N = v.shape[dim]
         grid = lambda META: (triton.cdiv(N, META["BLOCK_COL_SIZE"]),)
-        with torch_device_fn.device(v.device):
+        with get_torch_device_ctx(v.device):
             weight_norm_kernel_last[grid](
                 output, norm, v, g, M, N, eps=torch.finfo(torch.float32).tiny
             )
@@ -237,7 +237,7 @@ def weight_norm_interface_backward(w_grad, saved_v, saved_g, saved_norms, dim):
         M = saved_v.shape[0]
         N = math.prod(saved_v.shape[1:])
         grid = lambda META: (triton.cdiv(M, META["BLOCK_ROW_SIZE"]),)
-        with torch_device_fn.device(saved_v.device):
+        with get_torch_device_ctx(saved_v.device):
             weight_norm_bwd_kernel_first[grid](
                 v_grad,
                 g_grad,
@@ -253,7 +253,7 @@ def weight_norm_interface_backward(w_grad, saved_v, saved_g, saved_norms, dim):
         M = math.prod(saved_v.shape[:dim])
         N = saved_v.shape[dim]
         grid = lambda META: (triton.cdiv(N, META["BLOCK_COL_SIZE"]),)
-        with torch_device_fn.device(saved_v.device):
+        with get_torch_device_ctx(saved_v.device):
             weight_norm_bwd_kernel_last[grid](
                 v_grad,
                 g_grad,

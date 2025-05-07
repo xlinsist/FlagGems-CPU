@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import broadcastable, libentry
 from flag_gems.utils.shape_utils import bracket_next_power_of_2
 
@@ -159,7 +159,7 @@ def masked_select(inp, mask):
     np = triton.cdiv(n_blocks, n_blocks_per_row)
     NP_BLOCK = triton.next_power_of_2(np)
 
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         # Compute per cta sums and cumulative sums across ctas
         dtype = torch.int32 if N < 2**31 else torch.int64
         part_sums = torch.empty(np + 1, dtype=dtype, device=mask.device)

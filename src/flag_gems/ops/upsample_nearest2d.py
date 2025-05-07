@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, torch_device_fn, get_torch_device_ctx
 
 device = device.name
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ def upsample_nearest2d(
         triton.cdiv(N * C, 4),
     )
 
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         upsample_nearest2d_kernel[grid](
             output,
             input,

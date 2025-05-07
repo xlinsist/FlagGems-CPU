@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -57,7 +57,7 @@ def mv(inp, vec):
     N, M = inp.shape
     out = torch.empty((N,), device=inp.device, dtype=inp.dtype)
     grid = lambda META: (triton.cdiv(N, META["BLOCK_N"]),)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         mv_kernel[grid](
             inp,
             vec,

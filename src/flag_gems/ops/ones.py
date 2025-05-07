@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 from flag_gems.utils.shape_utils import volume
@@ -38,6 +38,6 @@ def ones(size, *, dtype=None, layout=None, device=None, pin_memory=None):
     N = volume(size)
     BLOCK_SIZE = 1024
     grid = (triton.cdiv(N, BLOCK_SIZE),)
-    with torch_device_fn.device(device):
+    with get_torch_device_ctx(device):
         ones_kernel[grid](out, N, BLOCK_SIZE)
     return out

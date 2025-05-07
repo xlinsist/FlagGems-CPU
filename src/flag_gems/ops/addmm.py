@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import get_torch_device_ctx, torch_device_fn
 from flag_gems.utils import broadcastable_to, libentry, libtuner
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -96,7 +96,7 @@ def addmm(bias, mat1, mat2, *, beta=1, alpha=1):
         triton.cdiv(M, META["BLOCK_SIZE_M"]),
         triton.cdiv(N, META["BLOCK_SIZE_N"]),
     )
-    with torch_device_fn.device(mat1.device):
+    with get_torch_device_ctx(mat1.device):
         addmm_kernel[grid](
             mat1,
             mat2,

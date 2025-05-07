@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 from flag_gems.utils.limits import get_dtype_min
@@ -114,7 +114,7 @@ def argmax(inp, dim=None, keepdim=False, *, dtype=None):
         else:
             out = torch.empty([], dtype=torch.int64, device=inp.device)
 
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             argmax_kernel_1[(mid_size, 1, 1)](
                 inp,
                 mid_value,
@@ -144,7 +144,7 @@ def argmax(inp, dim=None, keepdim=False, *, dtype=None):
             triton.cdiv(M, meta["BLOCK_M"]),
             K,
         )
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             argmax_kernel[grid](
                 inp,
                 out_index,

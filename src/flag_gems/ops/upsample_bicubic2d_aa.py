@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import triton_lang_extension as tle
 
 device = device.name
@@ -505,7 +505,7 @@ def _upsample_bicubic2d_aa(
         if (reciprocal_scale_w >= 1.0) or (reciprocal_scale_h >= 1.0)
         else upsample_bicubic2d_aa_kernel
     )
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         kernel[grid](
             output,
             input,

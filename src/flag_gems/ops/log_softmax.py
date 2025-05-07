@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -116,7 +116,7 @@ def log_softmax(self, dim, half_to_float=False):
         triton.cdiv(M, meta["BLOCK_M"]),
         K,
     )
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         log_softmax_kernel[grid](
             out,
             inp,
@@ -146,7 +146,7 @@ def log_softmax_backward(grad_output, output, dim, input_dtype):
         triton.cdiv(M, meta["BLOCK_M"]),
         K,
     )
-    with torch_device_fn.device(in_grad.device):
+    with get_torch_device_ctx(in_grad.device):
         log_softmax_backward_kernel[grid](
             output,
             grad_output,

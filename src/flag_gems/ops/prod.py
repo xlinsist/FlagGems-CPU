@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import dim_compress, libentry, libtuner
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -60,7 +60,7 @@ def prod(inp, *, dtype=None):
     mid = torch.empty((mid_size,), dtype=dtype, device=inp.device)
     out = torch.empty([], dtype=dtype, device=inp.device)
 
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         prod_kernel_mid[(mid_size, 1, 1)](inp, mid, M, block_size)
         prod_kernel_result[(1, 1, 1)](mid, out, mid_size, block_mid)
     return out
@@ -124,7 +124,7 @@ def prod_dim(inp, dim=None, keepdim=False, *, dtype=None):
         out = torch.squeeze(out, dim)
 
     grid = lambda meta: (triton.cdiv(M, meta["BLOCK_M"]),)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         prod_kernel[grid](inp, out, M, N)
 
     return out

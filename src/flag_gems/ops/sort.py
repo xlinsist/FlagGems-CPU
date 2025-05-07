@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems.ops.topk import _get_finfo_val, _get_iinfo_val, argsort
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 
 logger = logging.getLogger(__name__)

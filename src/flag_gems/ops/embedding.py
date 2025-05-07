@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -123,7 +123,7 @@ def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=
     weight = weight.contiguous()
     output = torch.empty((*indices.shape, N), device=indices.device, dtype=weight.dtype)
 
-    with torch_device_fn.device(weight.device):
+    with get_torch_device_ctx(weight.device):
         embedding_kernel[M,](output, indices, weight, N, BLOCK_SIZE)
 
     return output
@@ -172,7 +172,7 @@ def embedding_backward(
 
     HAS_PADDING_IDX = padding_idx is not None
 
-    with torch_device_fn.device(grad_outputs.device):
+    with get_torch_device_ctx(grad_outputs.device):
         embedding_backward_kernel[M,](
             grad_inputs,
             grad_outputs,

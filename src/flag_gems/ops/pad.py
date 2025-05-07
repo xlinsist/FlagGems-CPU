@@ -169,7 +169,7 @@ def generate_destination_passing_padding_wrapper(
         code.writeline("# kernel launch")
 
         # launch kernel
-        code.writeline("with torch_device_fn.device(in0.device):")
+        code.writeline("with get_torch_device_ctx(in0.device):")
         with code.indent():
             kernel_launch: str = f"{kernel_name}[grid]("
             code.writeline(kernel_launch)

@@ -6,7 +6,7 @@ import triton.language as tl
 from torch import Tensor
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, tl_extra_shim
 
 logger = logging.getLogger(__name__)
@@ -310,7 +310,6 @@ def batch_norm_backward_kernel(
                 curr_input_grad,
                 mask=batch_mask[:, None] & spatial_mask[None, :],
             )
-
 
 def batch_norm(
     input: Tensor,

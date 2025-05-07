@@ -5,7 +5,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -74,7 +74,7 @@ class SkipLayerNorm(torch.autograd.Function):
         bias = bias.contiguous()
         y = torch.empty_like(x)
 
-        with torch_device_fn.device(x.device):
+        with get_torch_device_ctx(x.device):
             skip_layer_norm_kernel[M,](
                 y, x, residual, weight, bias, N, 1, N, 1, N, 1, N, eps, BLOCK_SIZE
             )

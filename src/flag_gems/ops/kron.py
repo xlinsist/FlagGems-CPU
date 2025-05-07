@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import triton_lang_extension as tle
 
 logger = logging.getLogger(__name__)
@@ -172,7 +172,7 @@ def kron(A, B):
     a_batch_stride = M1 * N1
     b_batch_stride = M2 * N2
     c_batch_stride = M * N
-    with torch_device_fn.device(A.device):
+    with get_torch_device_ctx(A.device):
         grid = lambda meta: (
             batch_size
             * triton.cdiv(M, meta["BLOCK_M"])

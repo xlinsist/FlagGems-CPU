@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, libtuner
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -131,6 +131,6 @@ def bmm(A, B):
         triton.cdiv(meta["N"], meta["TILE_N"]),
         batch,
     )
-    with torch_device_fn.device(A.device):
+    with get_torch_device_ctx(A.device):
         bmm_kernel[grid_fn](A, B, out, M, N, K)
     return out

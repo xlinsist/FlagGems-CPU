@@ -23,6 +23,7 @@ from flag_gems.utils.type_utils import ELEMENTWISE_TYPE_PROMOTION_KIND, type_pro
 
 from .codegen_config_utils import CodeGenConfig, get_codegen_config
 
+from flag_gems.runtime import device
 
 # ------------------ Operation Description ---------------------------
 def _type_name(type) -> str:
@@ -891,8 +892,10 @@ class WrapperGenerator:
             else:
                 code.writeline(f"out{i}_stride_order = (0,)")
 
-        code.writeline("with torch_device_fn.device(in0.device.index):")
-        with code.indent():
+        is_cuda = device.name != 'cpu'
+        if is_cuda:
+            code.writeline("with torch_device_fn._DeviceGuard(in0.device.index):")
+        with code.indent(1 if is_cuda else 0):
             code.writeline(f"{self.jit_fn_name}[grid](")
             with code.indent():
                 params = []
@@ -951,8 +954,10 @@ class WrapperGenerator:
         for i in range(schema.num_output_tensors()):
             code.writeline(f"out{i}_strides = out{i}.stride()")
 
-        code.writeline("with torch_device_fn.device(in0.device.index):")
-        with code.indent():
+        is_cuda = device.name != 'cpu'
+        if is_cuda:
+            code.writeline("with torch_device_fn._DeviceGuard(in0.device.index):")
+        with code.indent(1 if is_cuda else 0):
             code.writeline(f"{self.jit_fn_name}[grid](")
             with code.indent():
                 params = []

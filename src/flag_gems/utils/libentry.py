@@ -601,7 +601,7 @@ class LibEntry(triton.KernelInterface):
 
         entry_key = self.key(spec_args, dns_args, const_args)
         device = torch_device_fn.current_device()
-        cache = self.kernel_cache[device]
+        cache = self.kernel_cache[device if isinstance(device, int) else 0]
         while entry_key not in cache:
             # NOTE: we serialize the first run of a jit function regardless of which device to run on
             # because Triton runtime is currently not threadsafe.

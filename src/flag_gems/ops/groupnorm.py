@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, tl_extra_shim
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -228,7 +228,7 @@ def group_norm_backward(
     if output_mask[0]:
         grad_inp = torch.empty_like(input)
         grid = (N * group,)
-        with torch_device_fn.device(input.device):
+        with get_torch_device_ctx(input.device):
             group_norm_backward_kernel[grid](
                 grad_out,
                 input,
@@ -250,7 +250,7 @@ def group_norm_backward(
 
     weight_grad = torch.empty_like(weight) if output_mask[1] else None
     bias_grad = torch.empty_like(weight) if output_mask[2] else None
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         weight_bias_backward_kernel[(C, 1, 1)](
             grad_out,
             input,

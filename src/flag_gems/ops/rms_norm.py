@@ -5,7 +5,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -153,7 +153,7 @@ class RmsNorm(torch.autograd.Function):
         y = torch.empty_like(x)
         inv_rms = torch.empty((M,), device=x.device, dtype=torch.float32)
 
-        with torch_device_fn.device(x.device):
+        with get_torch_device_ctx(x.device):
             rms_norm_kernel[M,](y, inv_rms, x, weight, N, 1, N, 1, N, eps, BLOCK_SIZE)
 
         ctx.save_for_backward(x, inv_rms, weight)
@@ -177,7 +177,7 @@ class RmsNorm(torch.autograd.Function):
         weight = weight.contiguous()
         dx = torch.empty_like(x)
 
-        with torch_device_fn.device(x.device):
+        with get_torch_device_ctx(x.device):
             rms_norm_grad_dx_kernel[M,](
                 x, dy, inv_rms, dx, weight, N, 1, N, 1, N, eps, BLOCK_SIZE
             )
@@ -191,7 +191,7 @@ class RmsNorm(torch.autograd.Function):
             (row_block_num, N), dtype=torch.float32, device=x.device
         )
 
-        with torch_device_fn.device(x.device):
+        with get_torch_device_ctx(x.device):
             rms_norm_grad_dw_kernel[row_block_num, col_block_num](
                 x,
                 dy,

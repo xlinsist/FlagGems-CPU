@@ -5,7 +5,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry, libtuner
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -13,7 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 @libentry()
+# TODO: Check libtuner for CPU
 @libtuner(
+# @triton.autotune(
     configs=runtime.get_tuned_config("mm"),
     key=["M", "N", "K"],
     strategy=["log", "log", "log"],
@@ -128,7 +130,8 @@ def mm(a, b):
         triton.cdiv(M, META["BLOCK_M"]) * triton.cdiv(N, META["BLOCK_N"]),
         META["SPLIT_K"],
     )
-    with torch_device_fn.device(a.device):
+
+    with get_torch_device_ctx(a.device):
         mm_kernel[grid](
             a,
             b,

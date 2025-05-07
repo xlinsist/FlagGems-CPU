@@ -6,7 +6,7 @@ import triton
 import triton.language as tl
 
 from flag_gems import runtime
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -346,7 +346,7 @@ def layer_norm(input, normalized_shape, weight=None, bias=None, eps=1e-5):
     mean = torch.empty(M, dtype=input.dtype, device=input.device)
     rstd = torch.empty(M, dtype=input.dtype, device=input.device)
 
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         if N <= 128:
             TILE_N = triton.next_power_of_2(N)
             TILE_M = triton.cdiv(1024, TILE_N)
@@ -433,7 +433,7 @@ def layer_norm_backward(
     grid = lambda meta: (triton.cdiv(N, meta["BLOCK_COL_SIZE"]), 1, 1)
     weight_grad = torch.empty_like(weight) if output_mask[1] else None
     bias_grad = torch.empty_like(bias) if output_mask[2] else None
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         weight_bias_backward_kernel[grid](
             grad_out, input, mean, rstd, weight_grad, bias_grad, M, N
         )

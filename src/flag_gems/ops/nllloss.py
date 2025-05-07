@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 
 logger = logging.getLogger(__name__)
@@ -267,7 +267,7 @@ def nll_loss_forward(self, target, weight=None, reduction=1, ignore_index=-100):
         out = torch.zeros([], dtype=torch.float32, device=self.device)
 
     grid = lambda meta: (triton.cdiv(N, meta["BLOCK_N"]),)
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         nll_loss_forward_kernel[grid](
             self,
             target,
@@ -314,7 +314,7 @@ def nll_loss_backward(
     grad_input = torch.zeros_like(self).contiguous()
 
     grid = lambda meta: (triton.cdiv(N, meta["BLOCK_N"]),)
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         nll_loss_backward_kernel[grid](
             grad_output,
             target,
@@ -357,7 +357,7 @@ def nll_loss2d_forward(self, target, weight=None, reduction=1, ignore_index=-100
         out = torch.zeros([], dtype=torch.float32, device=self.device)
 
     grid = lambda meta: (triton.cdiv(N * D, meta["BLOCK_ND"]),)
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         nll_loss2d_forward_kernel[grid](
             self, target, weight, out, ignore_index, N, C, D, reduction
         )
@@ -396,7 +396,7 @@ def nll_loss2d_backward(
     grad_input = torch.zeros_like(self).contiguous()
 
     grid = lambda meta: (triton.cdiv(N * D, meta["BLOCK_ND"]),)
-    with torch_device_fn.device(self.device):
+    with get_torch_device_ctx(self.device):
         nll_loss2d_backward_kernel[grid](
             grad_output,
             target,

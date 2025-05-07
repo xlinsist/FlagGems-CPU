@@ -5,7 +5,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -244,7 +244,7 @@ def apply_rotary_pos_emb(
 
     if inplace:
         grid = (n_tokens,)
-        with torch_device_fn.device(q.device):
+        with get_torch_device_ctx(q.device):
             apply_rotary_pos_emb_inplace_kernel[grid](
                 q,
                 k,
@@ -275,7 +275,7 @@ def apply_rotary_pos_emb(
         k_embed = torch.empty_like(k)
 
         grid = (n_tokens,)
-        with torch_device_fn.device(q_embed.device):
+        with get_torch_device_ctx(q_embed.device):
             apply_rotary_pos_emb_kernel[grid](
                 q_embed,
                 k_embed,
