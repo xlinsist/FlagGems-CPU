@@ -17,7 +17,7 @@
   - [ ] pointwise_dynamic
     - [ ] `floor_divide`，`remainder`相关测试报错：`Floating point exception`。已设置跳过测试。
   - [ ] pointwise_dynamic_type_promotion
-    - [ ]test_type_promotion_no_opmath: AssertionError: CPU only. There seems a mistake to dispatch to here.
+    - [ ] `where` related ops：`AssertionError: CPU only. There seems a mistake to dispatch to here.`
   - [ ] reduction_ops
     - [ ] 待添加
   - [x] shape_utils
@@ -42,12 +42,13 @@
 - [ ] 改进`batch_norm`算子，当前算法下无法通过`test_reduction_ops`下的`test_accuracy_batch_norm`测试
 - [ ] 移除分布在几十个文件中多余的`torch_device_fn`，该变量使用场景相当局限和单一，可以考虑将该全局变量优化掉。
 - [ ] 目前有几个测试的测试时间过长，即使设置`--mode=quick`，也需要至少十几分钟，甚至半小时，不利于正确性验证，考虑缩减测试规模或优化CPU上的相关算子。
-  - [ ] test_attension_ops
+  - [x] test_attension_ops
   - [ ] test_tensor_constructor
   - [ ] test_norm_ops
   - [ ] test_reduction_ops
   - [ ] 待添加
 - [ ] 优化`multinomial`算子。注：该算子存在改动且确定存在需要对CPU端进行更大的、进一步的优化，因此已将其放在cpu后端的算子目录中。
+- [ ] 重新实现`where`算子，FlagGems的`where`算子实现不能用CPU跑。
 
 ## 大致修改
 

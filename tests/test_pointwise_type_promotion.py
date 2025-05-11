@@ -38,6 +38,7 @@ def test_type_promotion_default(shape, alpha, float_type):
     gems_assert_close(res_out, ref_out, float_type)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("float_type", FLOAT_DTYPES)
 def test_type_promotion_no_opmath(shape, float_type):

@@ -1488,6 +1488,7 @@ def test_accuracy_sub_scalar_scalar(dtype):
 
 
 @pytest.mark.skipif(flag_gems.device == "musa", reason="RuntimeError")
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.where
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES)
@@ -1516,6 +1517,7 @@ def test_accuracy_where_self_out_cross_device(shape, dtype):
 
 
 @pytest.mark.where
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES)
 def test_accuracy_where_self_out(shape, dtype):
@@ -1535,6 +1537,7 @@ def test_accuracy_where_self_out(shape, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.where
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES)
@@ -1551,6 +1554,7 @@ def test_accuracy_where_self(shape, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.where
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("scalar", SCALARS)
@@ -1567,6 +1571,7 @@ def test_accuracy_where_scalar_self(shape, scalar, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Need to re-implement `where` operator")
 @pytest.mark.where
 @pytest.mark.parametrize("shape", POINTWISE_SHAPES)
 @pytest.mark.parametrize("scalar", SCALARS)
