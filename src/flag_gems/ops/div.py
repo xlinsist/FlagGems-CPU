@@ -217,10 +217,20 @@ def div_mode_(A, B, rounding_mode=None):
 
 @triton.jit
 def _remainder(x, y):
-    r = x % y
-    c1 = r != 0
-    c2 = (x < 0) ^ (y < 0)
-    return tl.where(c1 & c2, r + y, r)
+    # TODO: Check for the correctness of this change
+    # NOTE: The semantic of remainder could be found in tl.semantic.mod
+    # For triton, `%` operation will be lowered to `frem` in llvm, which behaves as `r = x - trunc(x/y) * y`,
+    #   which rounds toward zero.
+    # For torch, `%` operation behaves as `r = x - floor(x/y) * y`, which rounds toward negative infinity.
+    # There are two problems if we choose to use `%` of triton:
+    #   1. The sign of result for triton is the same with `x`, while torch's the same with `y`.
+    #   2. When x and y are of type integer, and y is 0, llvm will make the program crash.
+    # So I think applying the behavior of remainder of torch's is simple and efficient.
+    return x - y * tl.floor(x / y)
+    # r = x % y
+    # c1 = r != 0
+    # c2 = (x < 0) ^ (y < 0)
+    # return tl.where(c1 & c2, r + y, r)
 
 
 @pointwise_dynamic(promotion_methods=[(0, 1, "DEFAULT")])
