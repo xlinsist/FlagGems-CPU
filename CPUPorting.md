@@ -6,23 +6,26 @@
 
   - [x] attension_ops
   - [ ] binary_pointwise_ops
-    - [ ] clamp, nan_to_num算子：精度不够。
+    - [ ] clamp, nan_to_num算子：精度不足
     - [ ] `where` related ops：`AssertionError: CPU only. There seems a mistake to dispatch to here.`
+    - [x] `floor_divide`，`remainder`相关测试报错：`Floating point exception`。
+      该报错与Triton的对0取余行为有关。
+    - [ ] `remainder`相关测试精度不足
   - [x] blas_ops
   - [x] distribution_ops
   - [x] general_reduction_ops
   - [x] libentry
   - [ ] norm_ops
-    - [ ] 待添加
-  - [ ] pointwise_dynamic
-    - [ ] `floor_divide`，`remainder`相关测试报错：`Floating point exception`。已设置跳过测试。
+    - [ ] `batch_norm`：精度不足
+  - [x] pointwise_dynamic
   - [ ] pointwise_dynamic_type_promotion
     - [ ] `where` related ops：`AssertionError: CPU only. There seems a mistake to dispatch to here.`
   - [ ] reduction_ops
+    - [ ] `batch_norm`：精度不足
     - [ ] 待添加
   - [x] shape_utils
   - [ ] special_ops
-    - [ ] 待添加
+    - [ ] 精度不足: `pad`, `kron`
   - [x] tensor_constructor
     该测试中的`test_accuracy_randn`小概率出现精度不够的问题
   - [x] tensor_wrapper
@@ -34,21 +37,21 @@
 ## TODO
 
 - [ ] 浮点精度问题：现在的triton-cpu应该只支持float和double精度的计算，目前FlagGems中的精度相关代码，如测试函数，尚未被修改。
-- [ ] 并行：即使设置`TRITON_CPU_MAX_THREADS=0`，`pytest test_xxx.py`也无法并行运行算子？
+- [ ] 并行：即使设置`TRITON_CPU_MAX_THREADS=0`，`pytest test_xxx.py`也无法并行运行算子。
 - [ ] `Philox API`：对于`distribution ops`，采用了很多`cuda philox`，目前只采用了最简单的处理。
   相关函数：multinomial, randperm, rand_like, rand, randn, randn_like
 - [ ] `libtuner`：`mm`算子采用`libtuner`，但是会报错。替换成`triton.autotuner`才能正常运行。
 - [ ] `benchmark`运行时间过长，调整测试规模。
-- [ ] 改进`batch_norm`算子，当前算法下无法通过`test_reduction_ops`下的`test_accuracy_batch_norm`测试
 - [ ] 移除分布在几十个文件中多余的`torch_device_fn`，该变量使用场景相当局限和单一，可以考虑将该全局变量优化掉。
 - [ ] 目前有几个测试的测试时间过长，即使设置`--mode=quick`，也需要至少十几分钟，甚至半小时，不利于正确性验证，考虑缩减测试规模或优化CPU上的相关算子。
   - [x] test_attension_ops
   - [ ] test_tensor_constructor
-  - [ ] test_norm_ops
-  - [ ] test_reduction_ops
+  - [ ] test_reduction_ops: 算子`conv`运行时间过长
+  - [ ] test_special_ops: 算子`sort`, `upsample`运行时间过长
   - [ ] 待添加
 - [ ] 优化`multinomial`算子。注：该算子存在改动且确定存在需要对CPU端进行更大的、进一步的优化，因此已将其放在cpu后端的算子目录中。
 - [ ] 重新实现`where`算子，FlagGems的`where`算子实现不能用CPU跑。
+- [ ] 目前对于`div`算子文件中`__remainder`函数的处理方式不一定正确，后续需要确定其正确性。同时`floordiv`相关函数也需要关注。
 
 ## 大致修改
 

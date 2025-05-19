@@ -25,7 +25,7 @@ from .accuracy_utils import (
     gems_assert_equal,
     to_reference,
 )
-from .conftest import TO_CPU
+from .conftest import QUICK_MODE, TO_CPU
 
 # Make sure every thread has same seed.
 random.seed(time.time() // 100)
@@ -529,6 +529,7 @@ def test_pad(shape, dtype, pad_mode, contiguous):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Consuming a significant time")
 @pytest.mark.skipif(flag_gems.vendor_name == "cambricon", reason="fix")
 @pytest.mark.upsample
 @pytest.mark.parametrize("align_corners", [False, True])
@@ -568,6 +569,7 @@ def test_upsample_bicubic2d_aa(dtype, shape, scale, align_corners):
     gems_assert_close(res_out, ref_out, dtype, reduce_dim=reduce_dim)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Consuming a significant time")
 @pytest.mark.upsample
 @pytest.mark.parametrize("scale", [(2, 2), (2.1, 3.7), (1.3, 5.1), (0.3, 0.5)])
 @pytest.mark.parametrize("shape", UPSAMPLE_SHAPES)
@@ -807,7 +809,7 @@ def test_exception_hstack(shape, dtype):
             _ = torch.hstack(inp)
 
 
-CAT_SHAPES = [
+CAT_SHAPES = [[(1, 32), (8, 32)]] if QUICK_MODE else [
     [(1, 32), (8, 32)],
     [(16, 128), (32, 128)],
     [(1024, 1024), (1024, 1024)],
@@ -882,7 +884,7 @@ def test_accuracy_cat_empty_tensor(shape, dim, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
-VSTACK_SHAPES = [
+VSTACK_SHAPES = [[(2,), (2,)]] if QUICK_MODE else [
     [(3,), (3,)],
     [(3, 33), (7, 33)],
     [(13, 3, 333), (17, 3, 333), (7, 3, 333)],
@@ -910,6 +912,7 @@ VSTACK_SHAPES_TEST = VSTACK_SHAPES + (
 )
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Too time-consuming")
 @pytest.mark.vstack
 @pytest.mark.parametrize("shape", VSTACK_SHAPES_TEST)
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES + INT_DTYPES)
@@ -931,7 +934,7 @@ def test_accuracy_vstack(shape, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
-REPEAT_INTERLEAVE_SHAPES = [
+REPEAT_INTERLEAVE_SHAPES = [(1024, 1024)] if QUICK_MODE else [
     (1024, 1024),
     (20, 320, 15),
     (16, 128, 64, 60),
@@ -1116,7 +1119,7 @@ def test_accuracy_diagonal_backward(shape, dtype, dim1, dim2, offset):
 @pytest.mark.sort
 @pytest.mark.parametrize("batch_size", [4, 8])
 @pytest.mark.parametrize(
-    "hiddensize", [1, 256, 2048, 9333, 65536, 32768, 128 * 1024, 256 * 1024]
+    "hiddensize", [1, 256] if QUICK_MODE else [1, 256, 2048, 9333, 65536, 32768, 128 * 1024, 256 * 1024]
 )
 @pytest.mark.parametrize("descending", [True, False])
 @pytest.mark.parametrize("dtype", FLOAT_DTYPES + INT_DTYPES)
