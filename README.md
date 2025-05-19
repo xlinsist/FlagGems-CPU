@@ -45,11 +45,9 @@ print(C2)
 2. Benchmark single operator performance. Take `mm` and `layer_norm` for example:
 ```shell
 cd benchmark
-time pytest test_blas_perf.py -s --mode cpu --record log --level core --dtypes float32 --warmup 25 --iter 100 -m mm
-time pytest test_norm_perf.py -s --mode cpu --record log --level core --dtypes float32 --warmup 25 --iter 100 -m layer_norm
+time pytest test_blas_perf.py -s --record log --level core --dtypes float32 --warmup 25 --iter 100 -m mm
+time pytest test_norm_perf.py -s --record log --level core --dtypes float32 --warmup 25 --iter 100 -m layer_norm
 ```
-> FIXME: Resolve the error when running scripts in the benchmark directory due to `performance_utils.py` being incompatible with CPU. Specifically, the line with "torch_backend_device.matmul.allow_tf32 = False" fails with: "AttributeError: module 'torch.backends.cpu' has no attribute 'matmul'".
-
 
 3. Benchmark all ops performance. You can modify `run_all_perf_tests.sh` to test the ops you want.
 ```shell
