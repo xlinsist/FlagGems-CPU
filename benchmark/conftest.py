@@ -196,13 +196,13 @@ def setup_once(request):
     #     print(note_info)
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function", autouse=flag_gems.device != "cpu")
 def clear_function_cache():
     yield
     torch_device_fn.empty_cache()
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module", autouse=flag_gems.device != "cpu")
 def clear_module_cache():
     yield
     torch_device_fn.empty_cache()

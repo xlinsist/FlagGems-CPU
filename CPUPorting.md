@@ -2,6 +2,11 @@
 
 ## 进展
 
+- benchmarks:
+  
+  - [x] blas
+  - [x] norm
+
 - tests: 大多数测试都能跑通，现有问题在下面的`TODO`中说明
 
   - [x] attension_ops

@@ -20,7 +20,6 @@ for name in "${benchmark_names[@]}"; do
     {
         echo "Running test: $name with 16 threads"
         time pytest "test_${name}_perf.py" -s \
-            --mode cpu \
             --record log \
             --level core \
             --dtypes float32 \
