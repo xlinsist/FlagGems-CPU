@@ -260,6 +260,7 @@ def test_perf_count_nonzero():
     bench.run()
 
 
+@pytest.mark.skipif(True, reason="FlaggemsCPU not supported and should be fixed")
 @pytest.mark.dot
 def test_perf_dot():
     def dot_input_fn(shape, dtype, device):

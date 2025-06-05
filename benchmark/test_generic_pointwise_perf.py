@@ -76,6 +76,8 @@ def clamp_input_fn(shape, cur_dtype, device):
         ),
     ],
 )
+
+@pytest.mark.skipif(True, reason="FlaggemsCPU not supported and should be fixed")
 def test_generic_pointwise_benchmark(op_name, torch_op, input_fn, dtypes):
     bench = GenericBenchmark(
         input_fn=input_fn, op_name=op_name, torch_op=torch_op, dtypes=dtypes

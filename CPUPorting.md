@@ -22,15 +22,18 @@
   - [x] libentry
   - [ ] norm_ops
     - [ ] `batch_norm`：精度不足
+  - [ ] generic_dynamic
+    - [ ] benchmark目录中报错（目前版本已跳过报错示例）: `GenericBenchmark`
   - [x] pointwise_dynamic
   - [ ] pointwise_dynamic_type_promotion
     - [ ] `where` related ops：`AssertionError: CPU only. There seems a mistake to dispatch to here.`
   - [ ] reduction_ops
     - [ ] `batch_norm`：精度不足
-    - [ ] 待添加
+    - [ ] benchmark目录中报错（目前版本已跳过报错示例）: `dot`
   - [x] shape_utils
   - [ ] special_ops
     - [ ] 精度不足: `pad`, `kron`
+    - [ ] benchmark目录中报错（目前版本已跳过报错示例）: `diag`, `unique`, `isin`, `embedding`, `test_special_operations_benchmark`
   - [x] tensor_constructor
     该测试中的`test_accuracy_randn`小概率出现精度不够的问题
   - [x] tensor_wrapper

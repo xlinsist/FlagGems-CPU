@@ -9,9 +9,9 @@ export OPENBLAS_NUM_THREADS=16
 LOG_FILE="log_run_all.txt"
 > "$LOG_FILE"
 
-all_benchmark_names=("attention" "binary_pointwise" "blas" "distribution" "fused" "generic_pointwise" "norm" "reduction" "select_and_slice" "special" "tensor_concat" "tensor_constructor" "unary_pointwise")
 # "attention", "fused", "binary_pointwise", "unary_pointwise" are removed for not fully supporting float32.
-legal_benchmark_names=("blas" "distribution" "generic_pointwise" "norm"  "reduction" "select_and_slice" "special" "tensor_concat" "tensor_constructor")
+all_benchmark_names=("attention" "binary_pointwise" "blas" "distribution" "fused" "generic_pointwise" "norm" "reduction" "select_and_slice" "special" "tensor_concat" "tensor_constructor" "unary_pointwise")
+supported_benchmark_names=("blas" "norm" "reduction" "special" "generic_pointwise")
 
 # take "blas" and "norm" for example
 benchmark_names=("blas" "norm")
