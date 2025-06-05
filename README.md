@@ -10,11 +10,42 @@ This is a CPU development branch of FlagGems. We are temporarily naming this for
 
 1. PyTorch >= 2.2.0
 2. Transformers >= 4.40.2
-3. Triton-CPU
+3. Triton-CPU >= 3.3
 
 **Note:** Triton-CPU is currently experimental and need to be installed from source. Refer to [the official repo](https://github.com/triton-lang/triton-cpu) for installation.
 
-### Installation
+### Step one: CPU-specific Modification
+
+In the triton-cpu directory, add the following code to `/third_party/cpu/language/cpu/libdevice.py` (i.e., `triton.language.extra.cpu.libdevice`):
+
+```python
+@core.extern
+def div_rn(arg0, arg1, _builder=None):
+    return core.tensor(_builder.create_precise_divf(arg0.handle, arg1.handle), arg0.type)
+
+@core.extern
+def div_rz(arg0, arg1, _builder=None):
+    rn = core.tensor(_builder.create_precise_divf(arg0.handle, arg1.handle), arg0.type)
+    return core.tensor(_builder.create_trunc(rn.handle), rn.type)
+
+@core.extern
+def rint(arg0, _builder=None):
+    return core.extern_elementwise(
+        "", "", [arg0], {
+            (core.dtype("fp32"), ): ("Sleef_rintf(numel)", core.dtype("fp32")),
+            (core.dtype("fp64"), ): ("Sleef_rint(numel)" , core.dtype("fp64")),
+        }, is_pure=True, _builder=_builder)
+
+@core.extern
+def atan2(arg0, arg1, _builder=None):
+    return core.extern_elementwise(
+        "", "", [arg0, arg1], {
+            (core.dtype("fp32"), core.dtype("fp32")): ("Sleef_atan2f%(numel)_u10", core.dtype("fp32")),
+            (core.dtype("fp64"), core.dtype("fp64")): ("Sleef_atan2%(numel)_u10", core.dtype("fp64")),
+        }, is_pure=True, _builder=_builder)
+```
+
+### Step two: Installation
 
 ```shell
 cd <your-work-dir>
@@ -22,6 +53,7 @@ git clone git@github.com:xlinsist/FlagGems-CPU.git
 cd FlagGems
 git checkout cpu-dev # We implemented CPU-specific changes here
 pip install .
+export GEMS_VENDOR="arm" # Enable CPU support. You can also use it on x86 platform despite the name
 ```
 
 ## Usage
