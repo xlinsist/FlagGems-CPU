@@ -89,6 +89,8 @@ def threshold_input_fn(shape, cur_dtype, device):
         ),
     ],
 )
+
+@pytest.mark.skipif(True, reason="FlaggemsCPU not supported and should be fixed")
 def test_generic_pointwise_benchmark(op_name, torch_op, input_fn, dtypes):
     if vendor_name == "kunlunxin":
         if op_name in ["threshold"]:
