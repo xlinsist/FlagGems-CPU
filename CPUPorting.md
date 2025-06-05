@@ -169,8 +169,7 @@ def trunc_divide(A, B):
 ## 运行
 
 Triton-CPU 3.2版本下，部分算子可能不出现问题，因此，请确保安装的Triton-CPU版本在3.3以上。
-运行程序前，请先`export GEMS_VENDOR="arm"`，然后在triton源代码中，向`triton.language.extra.cpu.libdevice`中添加：
-
+运行程序前，请先`export GEMS_VENDOR="arm"`，然后在triton-cpu目录下，/third_party/cpu/language/cpu/libdevice.py中（即`triton.language.extra.cpu.libdevice`）添加：
 ```python
 @core.extern
 def div_rn(arg0, arg1, _builder=None):
