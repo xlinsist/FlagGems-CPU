@@ -23,12 +23,26 @@ attention:
   - 3
 bmm:
 - META:
-    TILE_M: 4
-    TILE_N: 4
-    TILE_K: 4
     GROUP_M: 1
-  num_warps: 4
+    TILE_K: 4
+    TILE_M: 16
+    TILE_N: 16
   num_stages: 2
+  num_warps: 4
+- META:
+    GROUP_M: 1
+    TILE_K: 8
+    TILE_M: 4
+    TILE_N: 16
+  num_stages: 2
+  num_warps: 4
+- META:
+    GROUP_M: 1
+    TILE_K: 8
+    TILE_M: 8
+    TILE_N: 16
+  num_stages: 2
+  num_warps: 4
 argmax:
 - META:
     BLOCK_M: 8
@@ -56,25 +70,57 @@ log_softmax:
   num_warps: 4
 mm:
 - META:
-    BLOCK_M: 4
-    BLOCK_N: 4
     BLOCK_K: 4
+    BLOCK_M: 16
+    BLOCK_N: 16
     SPLIT_K: 1
   num_stages: 4
   num_warps: 4
 - META:
-    BLOCK_M: 8
-    BLOCK_N: 8
     BLOCK_K: 8
+    BLOCK_M: 4
+    BLOCK_N: 16
+    SPLIT_K: 1
+  num_stages: 4
+  num_warps: 4
+- META:
+    BLOCK_K: 8
+    BLOCK_M: 8
+    BLOCK_N: 16
     SPLIT_K: 1
   num_stages: 4
   num_warps: 4
 softmax_non_inner:
-- META:
-    TILE_K: 4
+  - gen: true
+    param_map:
+      META:
+        TILE_N: tile_n
+        TILE_K: tile_k
+        ONE_TILE_PER_CTA: False
+      num_warps: 4
+      num_stages: 4
+    tile_n:
+      - 2
+      - 4
+    tile_k:
+      - 8
+      - 64
 softmax_inner:
 - META:
-    TILE_N: 4
+    TILE_N: 16
+    ONE_TILE_PER_CTA: False
+  num_stages: 4
+  num_warps: 4
+- META:
+    TILE_N: 32
+    ONE_TILE_PER_CTA: False
+  num_stages: 4
+  num_warps: 4
+- META:
+    TILE_N: 64
+    ONE_TILE_PER_CTA: False
+  num_stages: 4
+  num_warps: 4
 test_libentry:
 - META:
     TILE_N: 32
@@ -223,12 +269,15 @@ index_select:
 layer_norm_persistent:
 - gen: true
   param_map:
-    META: {}
+    META:
+      TILE_N: tile_n
     num_warps: warps
-  warps:
-  - 4
+  tile_n:
+  - 2
   - 8
   - 16
+  warps:
+  - 4
 layer_norm_loop:
 - gen: true
   param_map:
@@ -414,19 +463,12 @@ mv:
     num_stages: stages
   warps:
   - 4
-  - 8
   block_m:
   - 32
-  - 64
-  - 128
   block_n:
-  - 1
-  - 2
-  - 4
   - 8
   stages:
   - 3
-  - 4
 nonzero:
 - gen: true
   param_map:
@@ -853,15 +895,16 @@ conv2d_backward_weight:
 batch_norm:
 - gen: true
   param_map:
-    META: {}
+    META:
+      BLOCK_M: block_m
+      BLOCK_N: block_n
     num_warps: warps
+  block_m:
+    - 64
+  block_n:
+    - 256
   warps:
-  - 1
-  - 2
-  - 4
-  - 8
-  - 16
-  - 32
+    - 4
 index_put:
 - gen: true
   param_map:

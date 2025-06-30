@@ -371,7 +371,7 @@ class LayerNorm(torch.autograd.Function):
                     TILE_N,
                 )
             elif N <= 4096:
-                TILE_N = triton.next_power_of_2(N)
+               # TILE_N = triton.next_power_of_2(N)
                 grid = (M, 1, 1)
                 layer_norm_persistent_kernel[grid](
                     x,
@@ -383,7 +383,7 @@ class LayerNorm(torch.autograd.Function):
                     M,
                     N,
                     eps,
-                    TILE_N,
+                #    TILE_N,
                 )
             else:
                 grid = (M, 1, 1)
