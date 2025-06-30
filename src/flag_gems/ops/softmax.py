@@ -13,7 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 @libentry()
-@triton.heuristics(runtime.get_heuristic_config("softmax_non_inner"))
+#@triton.heuristics(runtime.get_heuristic_config("softmax_non_inner"))
+@triton.autotune(
+    configs=runtime.get_tuned_config("softmax_non_inner"),
+    key=["M", "N", "K"],
+)
 @triton.jit
 def softmax_kernel_non_inner(
     output_ptr,
@@ -85,7 +89,11 @@ def prev_multiple_of(a, b):
 
 
 @libentry()
-@triton.heuristics(runtime.get_heuristic_config("softmax_inner"))
+#@triton.heuristics(runtime.get_heuristic_config("softmax_inner"))
+@triton.autotune(
+    configs=runtime.get_tuned_config("softmax_inner"),
+    key=["M", "N"],
+)
 @triton.jit
 def softmax_kernel_inner(
     output_ptr,
