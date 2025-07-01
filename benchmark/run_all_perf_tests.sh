@@ -1,11 +1,5 @@
 #!/bin/bash
 
-export OMP_NUM_THREADS=16
-export MKL_NUM_THREADS=16
-export NUMEXPR_NUM_THREADS=16
-export VECLIB_MAXIMUM_THREADS=16
-export OPENBLAS_NUM_THREADS=16
-
 LOG_FILE="log_run_all.txt"
 > "$LOG_FILE"
 
@@ -14,11 +8,11 @@ all_benchmark_names=("attention" "binary_pointwise" "blas" "distribution" "fused
 supported_benchmark_names=("blas" "norm" "reduction" "special" "generic_pointwise")
 
 # take "blas" and "norm" for example
-benchmark_names=("blas" "norm")
+benchmark_names=("blas")
 
+export TRITON_PRINT_AUTOTUNING=1
 for name in "${benchmark_names[@]}"; do
     {
-        echo "Running test: $name with 16 threads"
         time pytest "test_${name}_perf.py" -s \
             --record log \
             --level core \
