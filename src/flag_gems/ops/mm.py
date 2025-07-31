@@ -170,7 +170,7 @@ def mm_out(a, b, *, out):
         triton.cdiv(M, META["BLOCK_M"]) * triton.cdiv(N, META["BLOCK_N"]),
         META["SPLIT_K"],
     )
-    with torch_device_fn.device(a.device):
+    with get_torch_device_ctx(a.device):
         mm_kernel[grid](
             a,
             b,

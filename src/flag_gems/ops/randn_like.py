@@ -9,6 +9,7 @@ from flag_gems.utils.random_utils import philox_backend_seed_offset
 
 UNROLL = 4
 
+logger = logging.getLogger(__name__)
 
 def randn_like(
     x, *, dtype=None, layout=None, device=None, pin_memory=None, memory_format=None

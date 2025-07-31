@@ -6,7 +6,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import get_torch_device_ctx, torch_device_fn
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 from flag_gems.utils.limits import get_dtype_min
@@ -140,7 +140,7 @@ def scan_then_fan_col(inp, out, out_indices, n_ele, dtype, use_out_indices=False
         partial_max_indices = None
 
     grid = (part_num,)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_max_kernel[grid](
             inp,
             out,
@@ -163,7 +163,7 @@ def scan_then_fan_col(inp, out, out_indices, n_ele, dtype, use_out_indices=False
             dtype,
             use_out_indices=True,
         )
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             add_base_max_kernel[grid](
                 out, out_indices, partial_max, partial_max_indices, n_ele, BLOCK_SIZE
             )
@@ -299,7 +299,7 @@ def scan_then_fan(inp, out, out_indices, A, B, C, dtype, use_out_indices=False):
         partial_max_indices = None
 
     grid = (A, part_num, C)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_max_abc_kernel[grid](
             inp,
             out,
@@ -326,7 +326,7 @@ def scan_then_fan(inp, out, out_indices, A, B, C, dtype, use_out_indices=False):
             dtype,
             use_out_indices=True,
         )
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             add_base_max_abc_kernel[grid](
                 out,
                 out_indices,
@@ -427,7 +427,7 @@ def scan_then_fan_loop(inp, out, out_indices, A, B, C, dtype):
     loop_num = math.ceil(B / BLOCK_SIZE)
 
     grid = (A, C)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_max_abc_loop_kernel[grid](
             inp,
             out,

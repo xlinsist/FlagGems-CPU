@@ -1,3 +1,4 @@
+import flag_gems
 import logging
 
 import torch

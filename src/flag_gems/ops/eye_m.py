@@ -4,7 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, get_torch_device_ctx, torch_device_fn
 from flag_gems.utils import libentry
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ def eye_m(n, m, *, dtype=None, layout=torch.strided, device=None, pin_memory=Non
     BLOCK_SIZE = 32
     grid = (triton.cdiv(n, BLOCK_SIZE), triton.cdiv(m, BLOCK_SIZE))
 
-    with torch_device_fn.device(device):
+    with get_torch_device_ctx(device):
         eye_kernel[grid](
             out,
             n,

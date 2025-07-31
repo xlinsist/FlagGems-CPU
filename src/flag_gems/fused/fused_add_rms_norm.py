@@ -4,7 +4,7 @@ import math
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import torch_device_fn, get_torch_device_ctx
 from flag_gems.utils import libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -63,7 +63,7 @@ def fused_add_rms_norm(x, residual, normalized_shape, weight, eps=1e-5):
     residual = residual.contiguous()
     weight = weight.contiguous()
 
-    with torch_device_fn.device(x.device):
+    with get_torch_device_ctx(x.device):
         fused_add_rms_norm_kernel[M,](
             x, residual, weight, N, 1, N, 1, N, eps, BLOCK_SIZE
         )

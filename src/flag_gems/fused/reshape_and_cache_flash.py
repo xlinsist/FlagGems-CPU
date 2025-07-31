@@ -3,7 +3,7 @@ import logging
 import triton
 import triton.language as tl
 
-from ..runtime import torch_device_fn
+from ..runtime import get_torch_device_ctx, torch_device_fn
 from ..utils import libentry
 
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def reshape_and_cache_flash(
     assert key_cache.stride(0) == value_cache.stride(0)
 
     grid = (num_tokens,)
-    with torch_device_fn.device(key.device):
+    with get_torch_device_ctx(key.device):
         reshape_and_cache_flash_kernel[grid](
             key,
             value,

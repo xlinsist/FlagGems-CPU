@@ -194,7 +194,7 @@ def group_norm(input, weight, bias, N, C, HxW, group, eps=1e-05):
     rstd = torch.empty((N, group), dtype=input.dtype, device=input.device)
 
     grid = (N * group,)
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         group_norm_kernel[grid](
             input,
             y,

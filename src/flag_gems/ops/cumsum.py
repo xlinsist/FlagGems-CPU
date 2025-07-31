@@ -5,7 +5,7 @@ import torch
 import triton
 import triton.language as tl
 
-from flag_gems.runtime import device, torch_device_fn
+from flag_gems.runtime import device, get_torch_device_ctx, torch_device_fn
 from flag_gems.utils import get_device_properties, libentry
 from flag_gems.utils import triton_lang_extension as tle
 
@@ -163,12 +163,12 @@ def scan_then_fan_col(inp, out, n_ele, dtype):
     partial_sum = torch.empty(part_num, dtype=dtype, device=inp.device)
 
     grid = (part_num,)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_sum_kernel[grid](inp, out, partial_sum, n_ele, part_num, BLOCK_SIZE)
 
     if part_num >= 2:
         scan_then_fan_col(partial_sum, partial_sum, part_num, dtype)
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             add_base_sum_kernel[grid](out, partial_sum, n_ele, part_num, BLOCK_SIZE)
 
 
@@ -181,14 +181,14 @@ def scan_then_fan(inp, out, A, B, C, dtype):
     partial_sum = torch.empty(A, part_num, C, dtype=dtype, device=inp.device)
 
     grid = (A, part_num, C)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_sum_abc_kernel[grid](
             inp, out, partial_sum, B, C, part_num, BLOCK_SIZE
         )
 
     if part_num >= 2:
         scan_then_fan(partial_sum, partial_sum, A, part_num, C, dtype)
-        with torch_device_fn.device(inp.device):
+        with get_torch_device_ctx(inp.device):
             add_base_sum_abc_kernel[grid](out, partial_sum, B, C, part_num, BLOCK_SIZE)
 
 
@@ -388,7 +388,7 @@ def normed_cumsum(inp, dim=-1):
         inp = inp.transpose(dim, -1).contiguous()
         dim = -1
     out = torch.empty_like(inp)
-    with torch_device_fn.device(inp.device.index):
+    with get_torch_device_ctx(inp.device.index):
         # Pass one, scan a (batch, n_tiles * TILE) sized block within each cta
         num_sms = get_device_properties(device).multi_processor_count
         TILE = 2048

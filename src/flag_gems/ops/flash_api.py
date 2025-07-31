@@ -14,7 +14,7 @@ from flag_gems.ops.flash_kernel import (
     flash_fwd_splitkv_kernel,
     flash_varlen_fwd_kernel,
 )
-from flag_gems.runtime import torch_device_fn
+from flag_gems.runtime import get_torch_device_ctx, torch_device_fn
 from flag_gems.utils.random_utils import philox_backend_seed_offset
 
 logger = logging.getLogger(__name__)
@@ -400,7 +400,7 @@ def mha_varlan_fwd(
         is_alibi = False
 
     # Prepare params to kernel
-    with torch_device_fn.device(q_device):
+    with get_torch_device_ctx(q_device):
         if out is not None:
             out_ = out
             if seqlenq_ngroups_swapped:
@@ -645,7 +645,7 @@ def mha_fwd(
 
         return best_splits
 
-    with torch_device_fn.device(q_device):
+    with get_torch_device_ctx(q_device):
         # Set softmax params
         lse = torch.empty(
             (batch_size, num_heads, seqlen_q), dtype=torch.float, device=q_device

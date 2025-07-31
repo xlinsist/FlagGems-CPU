@@ -335,7 +335,7 @@ def batch_norm(
     running_var = input if running_var is None else running_var
 
     # Launches 1D grid where each program operates over one feature.
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         batch_norm_forward_kernel[(feat_dim,)](
             input_3d,
             weight,
@@ -389,7 +389,7 @@ def batch_norm_backward(
         bias_grad = None
 
     # Launches 1D grid where each program operates over one feature.
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         batch_norm_backward_kernel[(feat_dim,)](
             output_grad_3d,
             input_3d,

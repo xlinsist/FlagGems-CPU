@@ -420,7 +420,7 @@ def layer_norm_backward(
     if output_mask[0]:
         in_grad = torch.empty_like(input)
         grid = lambda meta: (triton.cdiv(M, meta["BLOCK_ROW_SIZE"]), 1, 1)
-        with torch_device_fn.device(input.device):
+        with get_torch_device_ctx(input.device):
             layer_norm_backward_kernel[grid](
                 grad_out, input, weight, mean, rstd, in_grad, M, N
             )

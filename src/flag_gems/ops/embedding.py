@@ -163,7 +163,7 @@ def embedding_backward(
         INDICE_BLOCK_SIZE = 256
         indice_grid = (triton.cdiv(M, INDICE_BLOCK_SIZE),)
 
-        with torch_device_fn.device(grad_outputs.device):
+        with get_torch_device_ctx(grad_outputs.device):
             indice_freq_kernel[indice_grid](indice_freq, indices, M, INDICE_BLOCK_SIZE)
     else:
         indice_freq = None
@@ -184,7 +184,7 @@ def embedding_backward(
         )
 
     if scale_grad_by_freq:
-        with torch_device_fn.device(grad_outputs.device):
+        with get_torch_device_ctx(grad_outputs.device):
             embedding_grad_scale_kernel[M,](
                 grad_inputs, indice_freq, num_weights, N, BLOCK_SIZE
             )

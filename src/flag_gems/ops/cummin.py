@@ -427,7 +427,7 @@ def scan_then_fan_loop(inp, out, out_indices, A, B, C, dtype):
     loop_num = math.ceil(B / BLOCK_SIZE)
 
     grid = (A, C)
-    with torch_device_fn.device(inp.device):
+    with get_torch_device_ctx(inp.device):
         scan_part_min_abc_loop_kernel[grid](
             inp,
             out,

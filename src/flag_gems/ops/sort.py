@@ -261,7 +261,7 @@ def radix_sort(arr, k_bits=8, descending=False):
     grid_n = triton.cdiv(n, CTA_TILE_N)
     grid_for_global_hist = (m * grid_n, 1, 1)
 
-    with torch_device_fn.device(arr.device):
+    with get_torch_device_ctx(arr.device):
         global_hist = torch.zeros(
             (m, n_passes, num_bins), device=arr.device, dtype=torch.int32
         )

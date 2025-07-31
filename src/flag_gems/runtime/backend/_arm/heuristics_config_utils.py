@@ -1,4 +1,9 @@
+import torch
 import triton
+
+
+def simple_elementwise_blocksize_heur(args):
+    return 1024
 
 
 def argmax_heur_block_m(args):
@@ -6,7 +11,7 @@ def argmax_heur_block_m(args):
 
 
 def argmax_heur_block_n(args):
-    return min(4, triton.next_power_of_2(args["N"]))
+    return min(4096, triton.next_power_of_2(args["N"]))
 
 
 def argmin_heur_block_m(args):
@@ -14,7 +19,7 @@ def argmin_heur_block_m(args):
 
 
 def argmin_heur_block_n(args):
-    return min(4, triton.next_power_of_2(args["N"]))
+    return min(4096, triton.next_power_of_2(args["N"]))
 
 
 def bmm_heur_divisible_m(args):
@@ -47,9 +52,9 @@ def dropout_heur_num_warps(args):
 
 def exponential_heur_block(args):
     if args["N"] <= 512:
-        return 4
+        return 512
     else:
-        return 8
+        return 1024
 
 
 def exponential_heur_num_warps(args):
@@ -66,7 +71,7 @@ def gather_heur_block_m(args):
 
 
 def gather_heur_block_n(args):
-    return min(16, triton.next_power_of_2(args["N"]))
+    return min(2048, triton.next_power_of_2(args["N"]))
 
 
 def index_select_heur_block_m(args):
@@ -84,9 +89,9 @@ def mm_heur_even_k(args):
 
 def rand_heur_block(args):
     if args["N"] <= 512:
-        return 4
+        return 512
     else:
-        return 16
+        return 1024
 
 
 def rand_heur_num_warps(args):
@@ -115,26 +120,24 @@ def randn_heur_num_warps(args):
 
 
 def softmax_heur_tile_k(args):
-    # MAX_TILE_K = 8192
-    # NUM_SMS = torch.cuda.get_device_properties(
-    #     torch.cuda.current_device()
-    # ).multi_processor_count
-    # tile_k = 1
-    # upper_bound = min(args["K"], MAX_TILE_K)
-    # while tile_k <= upper_bound:
-    #     num_blocks = args["M"] * triton.cdiv(args["K"], tile_k)
-    #     num_waves = num_blocks / NUM_SMS
-    #     if (num_waves > 1) and (tile_k * 2 <= upper_bound):
-    #         tile_k *= 2
-    #     else:
-    #         break
-    # return tile_k
-    return 16
+    MAX_TILE_K = 8192
+    NUM_SMS = torch.cuda.get_device_properties(
+        torch.cuda.current_device()
+    ).multi_processor_count
+    tile_k = 1
+    upper_bound = min(args["K"], MAX_TILE_K)
+    while tile_k <= upper_bound:
+        num_blocks = args["M"] * triton.cdiv(args["K"], tile_k)
+        num_waves = num_blocks / NUM_SMS
+        if (num_waves > 1) and (tile_k * 2 <= upper_bound):
+            tile_k *= 2
+        else:
+            break
+    return tile_k
 
 
 def softmax_heur_tile_n_non_inner(args):
-    # return triton.cdiv(8192, args["TILE_K"])
-    return 16
+    return triton.cdiv(8192, args["TILE_K"])
 
 
 def softmax_heur_one_tile_per_cta(args):
@@ -152,11 +155,10 @@ def softmax_heur_num_warps_non_inner(args):
 
 
 def softmax_heur_tile_n_inner(args):
-    # if args["N"] <= (32 * 1024):
-    #     return triton.next_power_of_2(args["N"])
-    # else:
-    #     return 4096
-    return 4
+    if args["N"] <= (32 * 1024):
+        return triton.next_power_of_2(args["N"])
+    else:
+        return 4096
 
 
 def softmax_heur_num_warps_inner(args):
@@ -205,8 +207,12 @@ def upsample_nearest2d_SAME_W(args):
     return args["OW"] == args["IW"]
 
 
+def upsample_nearest2d_USE_INT32_IDX(args):
+    return args["N"] * args["C"] * args["OH"] * args["OW"] <= (2**31 - 1)  # INT32 MAX
+
+
 def batch_norm_heur_block_m(args):
-    return min(4, triton.next_power_of_2(args["batch_dim"]))
+    return min(2048, triton.next_power_of_2(args["batch_dim"]))
 
 
 def batch_norm_heur_block_n(args):
@@ -293,6 +299,7 @@ HEURISTICS_CONFIGS = {
     "upsample_nearest2d": {
         "SAME_H": upsample_nearest2d_SAME_H,
         "SAME_W": upsample_nearest2d_SAME_W,
+        "USE_INT32_IDX": upsample_nearest2d_USE_INT32_IDX,
     },
     "var_mean": {
         "BLOCK_N": var_mean_heur_block_n,
@@ -303,5 +310,21 @@ HEURISTICS_CONFIGS = {
     },
     "vdot": {
         "BLOCK_SIZE": vdot_heur_block_size,
+    },
+    "mha_varlen_prefill": {
+        "BLOCK_M": lambda args: 128,
+        "BLOCK_N": lambda args: 32,
+        "num_warps": lambda args: 4,
+        "num_stages": lambda args: 3,
+    },
+    "mha_varlen_decode": {
+        "BLOCK_M": lambda args: 16,
+        "BLOCK_N": lambda args: 64,
+        "num_warps": lambda args: 4,
+        "num_stages": lambda args: 3,
+    },
+    "elementwise_generic": {
+        "BLOCK_SIZE": simple_elementwise_blocksize_heur,
+        "num_warps": lambda args: 8,
     },
 }

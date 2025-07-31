@@ -42,7 +42,7 @@ def fill_tensor(input, value):
             f"fill_ only supports 0-dimension value tensor but got tensor with {value.ndim} dimensions."
         )
     out = torch.empty_like(input)
-    with torch_device_fn.device(input.device):
+    with get_torch_device_ctx(input.device):
         return fill_tensor_func(input, value, out0=out)
 
 def fill_tensor_(self, value):
