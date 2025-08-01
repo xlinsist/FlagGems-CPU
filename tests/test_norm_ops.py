@@ -654,6 +654,7 @@ def test_accuracy_vectornorm(shape, ord, dim, keepdim, dtype):
 @pytest.mark.batch_norm
 @pytest.mark.parametrize(
     "shape",
+    [(16,3)] if QUICK_MODE else
     [
         (16, 3),
         (32, 32, 32),

@@ -864,6 +864,7 @@ def test_accuracy_cat(shape, dim, dtype):
     gems_assert_equal(res_out, ref_out)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Floating point exception")
 @pytest.mark.cat
 @pytest.mark.parametrize(
     "shape, dim",

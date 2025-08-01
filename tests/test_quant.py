@@ -66,6 +66,7 @@ def convert_fp8(
         dst.copy_(src)
 
 
+@pytest.mark.skipif(flag_gems.device == "cpu", reason="Require CUDA")
 @pytest.mark.skipif(flag_gems.vendor_name == "hygon", reason="RuntimeError")
 @pytest.mark.skipif(flag_gems.device == "musa", reason="RuntimeError")
 @pytest.mark.concat_and_cache_mla

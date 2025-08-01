@@ -146,7 +146,7 @@ def test_accuracy_any_without_dim(shape, dtype, kind):
 @pytest.mark.any
 @pytest.mark.skipif(SkipVersion("torch", "<2.2"), reason="Skipping Pytorch version.")
 @pytest.mark.parametrize("kind, keepdim, dim, shape", KIND_KEEPDIM_DIMS_SHAPE)
-@pytest.mark.parametrize("dtype", FLOAT_DTYPES + [torch.bool])
+@pytest.mark.parametrize("dtype", [torch.bool] if QUICK_MODE else FLOAT_DTYPES + [torch.bool])
 def test_accuracy_any_dims(shape, dim, keepdim, dtype, kind):
     if kind == "allFalse":
         inp = torch.zeros(shape, dtype=dtype, device=flag_gems.device)
@@ -240,7 +240,7 @@ def test_accuracy_max_without_dim_uncontiguous(shape, dtype):
 @pytest.mark.max
 @pytest.mark.parametrize("shape", REDUCTION_SMALL_SHAPES)
 @pytest.mark.parametrize("keepdim, dim", KEEPDIM_DIM)
-@pytest.mark.parametrize("dtype", FLOAT_DTYPES + ALL_INT_DTYPES)
+@pytest.mark.parametrize("dtype", [torch.float32] if QUICK_MODE else FLOAT_DTYPES + ALL_INT_DTYPES)
 def test_accuracy_max_dim(shape, dim, keepdim, dtype):
     if dtype in FLOAT_DTYPES:
         inp = torch.randn(shape, dtype=dtype, device=flag_gems.device)
@@ -260,8 +260,8 @@ def test_accuracy_max_dim(shape, dim, keepdim, dtype):
 
 @pytest.mark.max
 @pytest.mark.parametrize("shape", [(4, 1048577, 4)])
-@pytest.mark.parametrize("keepdim, dim", [(True, 1), (False, 1)])
-@pytest.mark.parametrize("dtype", FLOAT_DTYPES + ALL_INT_DTYPES)
+@pytest.mark.parametrize("keepdim, dim", [(True, 1)] if QUICK_MODE else [(True, 1), (False, 1)])
+@pytest.mark.parametrize("dtype", [torch.float32] if QUICK_MODE else FLOAT_DTYPES + ALL_INT_DTYPES)
 def test_accuracy_max_dim_big_shape(shape, dim, keepdim, dtype):
     if dtype in FLOAT_DTYPES:
         inp = torch.randn(shape, dtype=dtype, device=flag_gems.device)
@@ -348,7 +348,7 @@ def test_accuracy_min_without_dim_all_inf(shape, dtype):
 @pytest.mark.min
 @pytest.mark.parametrize("shape", REDUCTION_SMALL_SHAPES)
 @pytest.mark.parametrize("keepdim, dim", KEEPDIM_DIM)
-@pytest.mark.parametrize("dtype", FLOAT_DTYPES + ALL_INT_DTYPES)
+@pytest.mark.parametrize("dtype", [torch.float32] if QUICK_MODE else FLOAT_DTYPES + ALL_INT_DTYPES)
 def test_accuracy_min_dim(shape, dim, keepdim, dtype):
     if dtype in FLOAT_DTYPES:
         inp = torch.randn(shape, dtype=dtype, device=flag_gems.device)

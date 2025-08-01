@@ -14,7 +14,7 @@ from .accuracy_utils import (
     gems_assert_equal,
     to_reference,
 )
-from .conftest import TO_CPU
+from .conftest import QUICK_MODE, TO_CPU
 
 device = flag_gems.device
 
@@ -175,7 +175,7 @@ def test_accuracy_full_like(shape, dtype, xdtype, fill_value):
 @pytest.mark.skipif(flag_gems.device == "musa", reason="ZeroDivisionError")
 @pytest.mark.skipif(flag_gems.vendor_name == "kunlunxin", reason="RESULT TODOFIX")
 @pytest.mark.randperm
-@pytest.mark.parametrize("n", [123, 12345, 123456])
+@pytest.mark.parametrize("n", [123] if QUICK_MODE else [123, 12345, 123456])
 @pytest.mark.parametrize("dtype", ALL_INT_DTYPES)
 def test_accuracy_randperm(n, dtype):
     if n > torch.iinfo(torch.int16).max and dtype == torch.int16:
@@ -200,7 +200,7 @@ def test_accuracy_randperm(n, dtype):
     ]
     + [(2**d, 2**d) for d in range(7, 13)],
 )
-@pytest.mark.parametrize("dtype", ALL_INT_DTYPES + ALL_FLOAT_DTYPES + BOOL_TYPES)
+@pytest.mark.parametrize("dtype", BOOL_TYPES if QUICK_MODE else ALL_INT_DTYPES + ALL_FLOAT_DTYPES + BOOL_TYPES)
 def test_accuracy_eye(shape, dtype):
     if (
         TO_CPU

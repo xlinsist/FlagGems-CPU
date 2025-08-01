@@ -257,7 +257,11 @@ def gems_flash_fwd(
 @pytest.mark.scaled_dot_product_attention
 @pytest.mark.parametrize(
     ["batch", "num_head", "q_seq_len", "kv_seq_len"],
-    [(4, 8, 1024, 1024), (4, 8, 2048, 256), (4, 8, 17, 1030)],
+    (
+        [(4, 8, 64, 64)]
+        if QUICK_MODE
+        else [(4, 8, 1024, 1024), (4, 8, 2048, 256), (4, 8, 17, 1030)]
+    ),
 )
 @pytest.mark.parametrize("head_size", [64, 128])
 @pytest.mark.parametrize("is_causal", [False, True])
@@ -288,9 +292,13 @@ def test_sdpa_legacy(
 @pytest.mark.scaled_dot_product_attention
 @pytest.mark.parametrize(
     ["batch", "num_head", "q_seq_len", "kv_seq_len"],
-    [
-        (4, 8, 1024, 1024),
-    ],
+    (
+        [(4, 8, 64, 64)]
+        if QUICK_MODE
+        else [
+            (4, 8, 1024, 1024),
+        ]
+    ),
 )
 @pytest.mark.parametrize("head_size", [64, 128, 256])
 @pytest.mark.parametrize("is_causal", [False, True])
@@ -318,7 +326,11 @@ def test_sdpa_square_qk_even_mn(
 @pytest.mark.scaled_dot_product_attention
 @pytest.mark.parametrize(
     ["batch", "num_head", "q_seq_len", "kv_seq_len"],
-    [(1, 1, 128, 2048), (4, 8, 1024, 128), (4, 8, 17, 1030)],
+    (
+        [(1, 1, 32, 64)]
+        if QUICK_MODE
+        else [(1, 1, 128, 2048), (4, 8, 1024, 128), (4, 8, 17, 1030)]
+    ),
 )
 @pytest.mark.parametrize("head_size", [64, 128, 256])
 @pytest.mark.parametrize("is_causal", [False])
@@ -347,7 +359,11 @@ def test_sdpa_nonsquare_qk(
 @pytest.mark.flash_attention_forward
 @pytest.mark.parametrize(
     ["batch", "num_head", "q_seq_len", "kv_seq_len"],
-    [(1, 1, 128, 2048), (4, 8, 1024, 128), (4, 8, 17, 1030)],
+    (
+        [(1, 1, 32, 64)]
+        if QUICK_MODE
+        else [(1, 1, 128, 2048), (4, 8, 1024, 128), (4, 8, 17, 1030)]
+    ),
 )
 @pytest.mark.parametrize("head_size", [64, 128, 256])
 @pytest.mark.parametrize("is_causal", [False, True])
@@ -380,7 +396,11 @@ def test_flash_fwd_nonsquare_qk(
 @pytest.mark.flash_attention_forward
 @pytest.mark.parametrize(
     ["batch", "num_head", "num_head_k", "q_seq_len", "kv_seq_len"],
-    [(4, 8, 2, 1024, 1024), (4, 4, 4, 1, 519)],
+    (
+        [(1, 4, 1, 64, 64)]
+        if QUICK_MODE
+        else [(4, 8, 2, 1024, 1024), (4, 4, 4, 1, 519)]
+    ),
 )
 @pytest.mark.parametrize("head_size", [128])
 @pytest.mark.parametrize("is_causal", [False, True])
@@ -455,7 +475,11 @@ def test_flash_fwd_gqa_alibi_softcap(
 @pytest.mark.flash_attention_forward
 @pytest.mark.parametrize(
     ["batch", "num_head", "num_head_k", "q_seq_len", "kv_seq_len"],
-    [(1, 4, 1, 1, 1024), (4, 4, 4, 1, 519)],
+    (
+        [(1, 4, 1, 1, 64)]
+        if QUICK_MODE
+        else [(1, 4, 1, 1, 1024), (4, 4, 4, 1, 519)]
+    ),
 )
 @pytest.mark.parametrize("head_size", [128])
 @pytest.mark.parametrize("is_causal", [False, True])
@@ -530,7 +554,16 @@ def test_flash_splitkv(
 @pytest.mark.flash_attention_forward
 @pytest.mark.parametrize(
     ["batch", "num_head", "q_seq_len", "kv_seq_len"],
-    [(1, 1, 128, 2048), (8, 32, 1024, 1024), (8, 32, 1024, 128), (8, 32, 17, 1030)],
+    (
+        [(1, 1, 64, 128)]
+        if QUICK_MODE
+        else [
+            (1, 1, 128, 2048),
+            (8, 32, 1024, 1024),
+            (8, 32, 1024, 128),
+            (8, 32, 17, 1030),
+        ]
+    ),
 )
 @pytest.mark.parametrize("head_size", [128])
 @pytest.mark.parametrize(

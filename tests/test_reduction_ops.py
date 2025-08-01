@@ -1055,7 +1055,7 @@ def test_accuracy_masked_select(shape, dtype, threshold):
     gems_assert_equal(res_out, ref_out)
 
 
-SHAPE_CONV1D = [
+SHAPE_CONV1D = [((32, 2, 4), (17, 2, 2))] if QUICK_MODE else [
     ((32, 2, 4), (17, 2, 2)),
     ((32, 15, 6), (17, 15, 2)),
     ((32, 16, 1024), (1024, 16, 8)),
@@ -1086,7 +1086,7 @@ def test_accuracy_conv1d(shape, kernel, stride, padding, dtype):
     gems_assert_close(res_out, ref_out, dtype)
 
 
-SHAPE_CONV2D = [
+SHAPE_CONV2D = [((1, 2, 5, 5), (1, 2, 3, 3), 1)] if QUICK_MODE else [
     ((1, 2, 5, 5), (1, 2, 3, 3), 1),
     ((2, 3, 9, 9), (1, 3, 3, 3), 1),
     ((2, 2, 3, 3), (1, 2, 2, 2), 1),
@@ -1181,7 +1181,7 @@ def test_accuracy_conv2d(shape, kernel, stride, padding, groups, dtype, dilation
         gems_assert_close(res_bias_grad, ref_bias_grad, dtype)
 
 
-SHAPE_DEPTHWISE = [
+SHAPE_DEPTHWISE = [((32, 4, 8, 8), (32, 1, 2, 2), (2, 2))] if QUICK_MODE else [
     ((32, 4, 8, 8), (32, 1, 2, 2), (2, 2)),
     ((18, 16, 4, 4), (16, 1, 2, 2), (2, 2)),
     ((9, 32, 4, 4), (128, 1, 2, 2), (2, 2)),
@@ -1230,7 +1230,7 @@ def test_accuracy_depthwise2d(
     gems_assert_close(res_out, ref_out, dtype)
 
 
-INDEX_PUT_SHAPE_ACC_FALSE = (
+INDEX_PUT_SHAPE_ACC_FALSE = [((2**28,), ((2**16,),), (2**16,))] if QUICK_MODE else (
     ((2**28,), ((2**16,),), (2**16,)),
     ((32, 32), ((8,), (8,)), (8,)),
     ((32, 32), ((8,), (2, 8)), (8,)),
@@ -1248,7 +1248,7 @@ INDEX_PUT_SHAPE_ACC_FALSE = (
     ),
 )
 
-INDEX_ACC_SHAPE = (
+INDEX_ACC_SHAPE = [((2**28,), ((2**16,),))] if QUICK_MODE else (
     ((2**28,), ((2**16,),)),
     ((32, 32), ((8,), (8,))),
     ((32, 32), ((8,), (2, 8))),
